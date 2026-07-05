@@ -6,21 +6,21 @@
 ---
 
 ## 📌 Project Overview
-**CampusNest** is a comprehensive, web-based Smart Hostel Management System designed to digitize and streamline traditional hostel administration[cite: 1]. By centralizing student registrations, room allocations, daily attendance logs, and grievance management into a single platform, CampusNest eliminates error-prone paperwork and minimizes operational delays[cite: 1].
+**CampusNest** is a comprehensive, web-based Smart Hostel Management System designed to digitize and streamline traditional hostel administration. By centralizing student registrations, room allocations, daily attendance logs, and grievance management into a single platform, CampusNest eliminates error-prone paperwork and minimizes operational delays.
 
 ### 🚫 The Problem
 Traditional hostel management relies heavily on manual ledgers and paper-based tracking, resulting in several challenges:
-*   **Manual Attendance:** Time-consuming and prone to proxy entries[cite: 1].
-*   **Paper Records:** Vulnerable to damage, loss, and difficult to search or audit[cite: 1].
-*   **Inefficient Room Allocation:** Manual matching leads to utilization delays and communication gaps[cite: 1].
-*   **Delayed Grievance Redressal:** Complaints are written down with no tracking or automated escalation[cite: 1].
-*   **Siloed Data:** Lack of a centralized, secure database for student profiles[cite: 1].
+*   **Manual Attendance:** Time-consuming and prone to proxy entries.
+*   **Paper Records:** Vulnerable to damage, loss, and difficult to search or audit.
+*   **Inefficient Room Allocation:** Manual matching leads to utilization delays and communication gaps.
+*   **Delayed Grievance Redressal:** Complaints are written down with no tracking or automated escalation.
+*   **Siloed Data:** Lack of a centralized, secure database for student profiles.
 
 ### 💡 Our Solution
 CampusNest automates these workflows via an intuitive web application providing:
-*   Online student onboarding and secure admin approval flows[cite: 1].
-*   Digital room tracking and automated bed allocations[cite: 1].
-*   Centralized dashboard reporting for administrators and dynamic self-service portals for students[cite: 1].
+*   Online student onboarding and secure admin approval flows.
+*   Digital room tracking and automated bed allocations.
+*   Centralized dashboard reporting for administrators and dynamic self-service portals for students.
 
 ---
 
@@ -28,10 +28,10 @@ CampusNest automates these workflows via an intuitive web application providing:
 
 | Layer | Technology |
 | :--- | :--- |
-| **Frontend** | HTML5, CSS3, Bootstrap 5, JavaScript[cite: 1] |
-| **Backend** | Python, Flask[cite: 1] |
-| **Database** | SQLite[cite: 1] |
-| **Tools & Version Control** | VS Code, Git, GitHub[cite: 1] |
+| **Frontend** | HTML5, CSS3, Bootstrap 5, JavaScript |
+| **Backend** | Python, Flask |
+| **Database** | SQLite |
+| **Tools & Version Control** | VS Code, Git, GitHub |
 
 ---
 
@@ -55,21 +55,21 @@ The platform is built on a lightweight, modular MVC pattern ensuring fast respon
 ---
 
 ## 🚀 Key Features
-*   **🔐 Authentication & Access Control:** Secure registration and login workflows for both Students and System Administrators[cite: 1].
-*   **👥 Admin Approval Workflow:** Verification queue preventing unauthorized student profiles from entering active rosters[cite: 1].
-*   **🛏️ Room Management:** Real-time visibility into room capacity, occupied beds, and structural details[cite: 1].
-*   **📅 Attendance Management:** Quick-log interface for daily rolls with filterable history views[cite: 1].
-*   **🎫 Integrated Complaint Module:** Digital ticketing pipeline for students to file issues, currently expanding to track status updates[cite: 1].
-*   **📊 Executive Dashboard:** Quick-glance metrics offering high-level visibility into hostel vacancy and active tickets[cite: 1].
+*   **🔐 Authentication & Access Control:** Secure registration and login workflows for both Students and System Administrators.
+*   **👥 Admin Approval Workflow:** Verification queue preventing unauthorized student profiles from entering active rosters.
+*   **🛏️ Room Management:** Real-time visibility into room capacity, occupied beds, and structural details.
+*   **📅 Attendance Management:** Quick-log interface for daily rolls with filterable history views.
+*   **🎫 Integrated Complaint Module:** Digital ticketing pipeline for students to file issues, currently expanding to track status updates.
+*   **📊 Executive Dashboard:** Quick-glance metrics offering high-level visibility into hostel vacancy and active tickets.
 
 ---
 
 ## 🎯 Project Roadmap & Future Scope
-*   [ ] **🔔 Smart Notifications:** Automated Email/SMS alerts for fee dues, leave requests, and announcements[cite: 1].
-*   [ ] **🤖 AI Assistant:** Machine-learning-driven intelligent room matching based on student preferences or habits[cite: 1].
-*   [ ] **📱 Mobile Application:** Dedicated native app for on-the-go room check-ins and attendance validation[cite: 1].
-*   [ ] **📸 QR-Based Attendance:** High-speed contactless verification using temporary QR codes[cite: 1].
-*   [ ] **📉 Advanced Analytics:** Deep-dive data visualizations on occupancy patterns and asset lifecycles[cite: 1].
+*   [ ] **🔔 Smart Notifications:** Automated Email/SMS alerts for fee dues, leave requests, and announcements.
+*   [ ] **🤖 AI Assistant:** Machine-learning-driven intelligent room matching based on student preferences or habits.
+*   [ ] **📱 Mobile Application:** Dedicated native app for on-the-go room check-ins and attendance validation.
+*   [ ] **📸 QR-Based Attendance:** High-speed contactless verification using temporary QR codes.
+*   [ ] **📉 Advanced Analytics:** Deep-dive data visualizations on occupancy patterns and asset lifecycles.
 
 ---
 
@@ -83,21 +83,21 @@ The project is scheduled across an **8-week execution plan**[cite: 1]:
 *   **Week 8:** Final Documentation & Release[cite: 1]
 
 ### ⏱️ First 10 Days Sprint Summary
-*   **Days 1–3:** Problem discovery, requirements definition, and structural architecture modeling[cite: 1].
-*   **Days 4–5:** SQLite schema definition and Flask application environment structure initialization[cite: 1].
-*   **Days 6–8:** Onboarding/Admin verification UI coding and student/room data management foundation[cite: 1].
-*   **Days 9–10:** Attendance logging design, dashboard assembly, and optimization planning[cite: 1].
+*   **Days 1–3:** Problem discovery, requirements definition, and structural architecture modeling.
+*   **Days 4–5:** SQLite schema definition and Flask application environment structure initialization.
+*   **Days 6–8:** Onboarding/Admin verification UI coding and student/room data management foundation.
+*   **Days 9–10:** Attendance logging design, dashboard assembly, and optimization planning.
 
 ---
 
 ## 👥 Meet Team Quantum Minds
-A specialized group of **B.Tech – Artificial Intelligence & Machine Learning** students making things happen[cite: 1]:
+A specialized group of **B.Tech – Artificial Intelligence & Machine Learning** students making things happen:
 
-*   **M. Kasturi (Team Lead & Backend Developer):** Project governance, Flask framework implementation, database routing, and cross-team coordination[cite: 1].
-*   **L. Naga Varshini (Frontend Developer):** Design and assembly of responsive student portals, dashboards, and authentication screens[cite: 1].
-*   **T. Saranya (Backend & Database Developer):** SQLite schema construction, CRUD operations optimization, and attendance tracking infrastructure[cite: 1].
-*   **K. Navya Sai Sri (Frontend Developer & UI Designer):** UI layout implementation for room lists, complaint filing pages, and Bootstrap theme styling[cite: 1].
-*   **P. Vyshnavi (Testing & Documentation Engineer):** Test case generation, quality assurance reviews, and core technical project documentation[cite: 1].
+*   **M. Kasturi (Team Lead & Backend Developer):** Project governance, Flask framework implementation, database routing, and cross-team coordination.
+*   **L. Naga Varshini (Frontend Developer):** Design and assembly of responsive student portals, dashboards, and authentication screens.
+*   **T. Saranya (Backend & Database Developer):** SQLite schema construction, CRUD operations optimization, and attendance tracking infrastructure.
+*   **K. Navya Sai Sri (Frontend Developer & UI Designer):** UI layout implementation for room lists, complaint filing pages, and Bootstrap theme styling.
+*   **P. Vyshnavi (Testing & Documentation Engineer):** Test case generation, quality assurance reviews, and core technical project documentation.
 
 ---
 
