@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - HostelOS{% endblock %}
+{% block header_title %}Warden Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- KPI Indicators Grid -->
+<div class="grid grid-cols-4 mb-4">
+    <div class="card kpi-card">
+        <div class="stat-label">Total Students</div>
+        <div class="stat-value text-primary">{{ total_students }}</div>
+        <div class="stat-desc">Approved residents</div>
+    </div>
+    <div class="card kpi-card">
+        <div class="stat-label">Hostel Occupancy</div>
+        <div class="stat-value text-success">{{ occupied_beds }} / {{ total_beds }}</div>
+        <div class="stat-desc">{{ available_beds }} spaces available</div>
+    </div>
+    <div class="card kpi-card">
+        <div class="stat-label">Occupancy Rate</div>
+        <div class="stat-value text-info">{{ occupancy_pct }}%</div>
+        <div class="stat-desc">Total bed allocation rate</div>
+    </div>
+    <div class="card kpi-card">
+        <div class="stat-label">Pending Approvals</div>
+        <div class="stat-value text-warning">{{ pending_approvals_count }}</div>
+        <div class="stat-desc"><a href="{{ url_for('admin.view_pending') }}" class="fw-semibold">Review requests →</a></div>
+    </div>
+</div>
+
+<div class="grid grid-cols-4 mb-4">
+    <div class="card kpi-card">
+        <div class="stat-label">Present Today</div>
+        <div class="stat-value text-success"><i class="bi bi-check-circle"></i> {{ attendance_today }}</div>
+        <div class="stat-desc">Marked present today</div>
+    </div>
+    <div class="card kpi-card">
+        <div class="stat-label">Absent Today</div>
+        <div class="stat-value text-danger"><i class="bi bi-x-circle text-danger"></i> {{ absent_today }}</div>
+        <div class="stat-desc">Marked absent today</div>
+    </div>
+    <div class="card kpi-card">
+        <div class="stat-label">Complaints Status</div>
+        <div class="stat-value text-secondary">{{ complaint_stats.pending }} / {{ complaint_stats.resolved }}</div>
+        <div class="stat-desc"><span class="text-danger">Pending</span> / <span class="text-success">Resolved</span></div>
+    </div>
+    <div class="card kpi-card">
+        <div class="stat-label">Rooms Split</div>
+        <div class="stat-value text-primary" style="font-size: 1.5rem; line-height: 1.8rem; margin: 4px 0;">AC: {{ ac_rooms }} | EX: {{ executive_rooms }}</div>
+        <div class="stat-desc">Normal rooms: {{ normal_rooms }}</div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card h-100">
+            <h5 class="mb-4 text-primary fw-semibold"><i class="bi bi-bar-chart-fill"></i> Floor-wise Occupancy</h5>
+            <div style="height: 300px; position: relative;">
+                <canvas id="floorOccupancyChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <h5 class="mb-4 text-primary fw-semibold"><i class="bi bi-pie-chart-fill"></i> Students by Year</h5>
+            <div style="height: 300px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="yearDistributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Post Notice and Announcements -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <h5 class="mb-4 text-primary fw-semibold"><i class="bi bi-megaphone-fill"></i> Post Official Notice</h5>
+            <form action="{{ url_for('admin.post_notice') }}" method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="notice-title">Notice Title</label>
+                    <input type="text" name="title" id="notice-title" class="form-control" placeholder="E.g. Cleanliness check, Water shutoff alert" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="notice-target">Target Audience</label>
+                    <select name="target_audience" id="notice-target" class="form-control">
+                        <option value="All">All Students</option>
+                        <option value="First Year">First Year Only</option>
+                        <option value="Second Year">Second Year Only</option>
+                        <option value="Third Year">Third Year Only</option>
+                        <option value="Final Year">Final Year Only</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="notice-content">Notice Content</label>
+                    <textarea name="content" id="notice-content" rows="4" class="form-control" placeholder="Write notice details here..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Publish Notice</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Active Notices Log -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <h5 class="mb-4 text-primary fw-semibold"><i class="bi bi-bell-fill"></i> Notice Board History</h5>
+            <div class="notice-list" style="max-height: 400px; overflow-y: auto;">
+                {% if notices %}
+                    {% for notice in notices %}
+                        <div class="notice-card mb-3">
+                            <div class="notice-title">{{ notice.title }} <span class="badge badge-info bg-light text-primary" style="font-size:9px;">{{ notice.target_audience }}</span></div>
+                            <div class="notice-meta">Posted on {{ notice.created_at.strftime('%Y-%m-%d %I:%M %p') }}</div>
+                            <div class="notice-content">{{ notice.content }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-secondary text-sm text-center py-5">
+                        No notices posted yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // 1. Floor occupancy chart
+        const floorCtx = document.getElementById('floorOccupancyChart').getContext('2d');
+        new Chart(floorCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Floor 1 (1st Yr)', 'Floor 2 (2nd Yr)', 'Floor 3 (3rd/4th Yr)'],
+                datasets: [
+                    {
+                        label: 'Occupants',
+                        data: [
+                            {{ floor_occupancy[1].occupied }},
+                            {{ floor_occupancy[2].occupied }},
+                            {{ floor_occupancy[3].occupied }}
+                        ],
+                        backgroundColor: '#2563eb',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Total Capacity',
+                        data: [
+                            {{ floor_occupancy[1].total }},
+                            {{ floor_occupancy[2].total }},
+                            {{ floor_occupancy[3].total }}
+                        ],
+                        backgroundColor: '#e5e7eb',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f3f4f6'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12
+                        }
+                    }
+                }
+            }
+        });
+
+        // 2. Year distribution chart
+        const yearCtx = document.getElementById('yearDistributionChart').getContext('2d');
+        new Chart(yearCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['1st Year', '2nd Year', '3rd Year', 'Final Year'],
+                datasets: [{
+                    data: [
+                        {{ year_distribution[1] }},
+                        {{ year_distribution[2] }},
+                        {{ year_distribution[3] }},
+                        {{ year_distribution[4] }}
+                    ],
+                    backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#3b82f6'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12
+                        }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Mark Attendance - HostelOS{% endblock %}
+{% block header_title %}Mark Daily Attendance{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Filter Bar Card -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <h5 class="mb-3 text-primary fw-semibold"><i class="bi bi-funnel-fill"></i> Select Class & Date</h5>
+            <form action="{{ url_for('attendance.mark') }}" method="GET" class="row align-items-end">
+                <div class="col-md-4 form-group mb-md-0">
+                    <label class="form-label" for="filter-year">Select Academic Year</label>
+                    <select name="year" id="filter-year" class="form-control" onchange="this.form.submit()">
+                        <option value="1" {% if year == 1 %}selected{% endif %}>1st Year (First Floor)</option>
+                        <option value="2" {% if year == 2 %}selected{% endif %}>2nd Year (Second Floor)</option>
+                        <option value="3" {% if year == 3 %}selected{% endif %}>3rd Year (Third Floor)</option>
+                        <option value="4" {% if year == 4 %}selected{% endif %}>4th Year (Third Floor)</option>
+                    </select>
+                </div>
+                <div class="col-md-4 form-group mb-md-0">
+                    <label class="form-label" for="filter-date">Attendance Date</label>
+                    <input type="date" name="date" id="filter-date" class="form-control" value="{{ date_str }}" onchange="this.form.submit()">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-secondary w-100"><i class="bi bi-arrow-clockwise"></i> Refresh List</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Attendance Table Card -->
+    <div class="col-12">
+        <div class="card">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h5 class="text-primary fw-semibold m-0"><i class="bi bi-journal-check"></i> Year {{ year }} Attendance - Date: {{ date_str }}</h5>
+                <a href="{{ url_for('attendance.analytics') }}" class="btn btn-secondary btn-sm"><i class="bi bi-bar-chart-line"></i> View Attendance Trends</a>
+            </div>
+            
+            {% if students %}
+                <form action="{{ url_for('attendance.mark', year=year, date=date_str) }}" method="POST">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Student Name</th>
+                                    <th>Room No</th>
+                                    <th>Status Selection</th>
+                                    <th>Remarks / Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in students %}
+                                    {% set student = item.student %}
+                                    <tr>
+                                        <td><strong>{{ student.username }}</strong></td>
+                                        <td class="fw-semibold">{{ student.name }}</td>
+                                        <td>
+                                            {% if student.student_profile and student.student_profile.room %}
+                                                <span class="badge bg-light text-primary border">{{ student.student_profile.room.room_number }}</span>
+                                            {% else %}
+                                                <span class="text-muted text-xs">Unallocated</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Status select">
+                                                <input type="radio" class="btn-check" name="status_{{ student.id }}" id="status_p_{{ student.id }}" value="Present" {% if item.status == 'Present' %}checked{% endif %}>
+                                                <label class="btn btn-outline-success btn-sm py-1 px-3" for="status_p_{{ student.id }}">Present</label>
+                                                
+                                                <input type="radio" class="btn-check" name="status_{{ student.id }}" id="status_a_{{ student.id }}" value="Absent" {% if item.status == 'Absent' %}checked{% endif %}>
+                                                <label class="btn btn-outline-danger btn-sm py-1 px-3" for="status_a_{{ student.id }}">Absent</label>
+                                                
+                                                <input type="radio" class="btn-check" name="status_{{ student.id }}" id="status_l_{{ student.id }}" value="Leave" {% if item.status == 'Leave' %}checked{% endif %}>
+                                                <label class="btn btn-outline-warning btn-sm py-1 px-3" for="status_l_{{ student.id }}">Leave</label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="remarks_{{ student.id }}" class="form-control form-control-sm py-1" value="{{ item.remarks }}" placeholder="E.g. Medical leave, Late entry">
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary mt-4 py-2 px-4"><i class="bi bi-save"></i> Save & Lock Attendance</button>
+                </form>
+            {% else %}
+                <div class="text-center py-5 text-secondary">
+                    <i class="bi bi-people text-muted" style="font-size: 48px;"></i>
+                    <p class="mt-3">No approved students found for Year {{ year }}. Please approve students to populate roster.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Student - HostelOS{% endblock %}
+{% block header_title %}Edit Student Details{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <h5 class="mb-4 text-primary fw-semibold"><i class="bi bi-pencil-square"></i> Modify Student Information</h5>
+            
+            <form action="{{ url_for('admin.edit_student', user_id=student.id) }}" method="POST">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="edit-name">Student Full Name</label>
+                        <input type="text" name="name" id="edit-name" class="form-control" value="{{ student.name }}" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="edit-phone">Student Phone Number</label>
+                        <input type="text" name="phone" id="edit-phone" class="form-control" value="{{ student.phone }}" required>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="edit-branch">Branch</label>
+                        <input type="text" name="branch" id="edit-branch" class="form-control" value="{{ profile.branch }}" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="edit-year">Year of Study</label>
+                        <select name="year" id="edit-year" class="form-control" required>
+                            <option value="1" {% if profile.year == 1 %}selected{% endif %}>1st Year (First Floor)</option>
+                            <option value="2" {% if profile.year == 2 %}selected{% endif %}>2nd Year (Second Floor)</option>
+                            <option value="3" {% if profile.year == 3 %}selected{% endif %}>3rd Year (Third Floor)</option>
+                            <option value="4" {% if profile.year == 4 %}selected{% endif %}>4th Year (Third Floor)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit-parent-phone">Parent/Guardian Phone</label>
+                    <input type="text" name="parent_phone" id="edit-parent-phone" class="form-control" value="{{ profile.parent_phone }}" required>
+                </div>
+                
+                <h6 class="mt-4 mb-3 border-bottom pb-2 fw-semibold text-secondary"><i class="bi bi-wallet2"></i> College & Fee Payment Status</h6>
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label class="form-label" for="edit-college-status">College Status</label>
+                        <input type="text" name="collage_status" id="edit-college-status" class="form-control" value="{{ profile.collage_status or 'N/A' }}" required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label class="form-label" for="edit-hostel-fee">Hostel Fee Status</label>
+                        <input type="text" name="hostel_fee_status" id="edit-hostel-fee" class="form-control" value="{{ profile.hostel_fee_status or 'N/A' }}" required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label class="form-label" for="edit-tuition-fee">Tuition Fee Status</label>
+                        <input type="text" name="tuition_fee_status" id="edit-tuition-fee" class="form-control" value="{{ profile.tuition_fee_status or 'N/A' }}" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit-remarks">Warden Remarks</label>
+                    <textarea name="remarks" id="edit-remarks" class="form-control" rows="2" placeholder="Any payment notes or student status remarks...">{{ profile.remarks or '' }}</textarea>
+                </div>
+                
+                <h6 class="mt-4 mb-3 border-bottom pb-2 fw-semibold text-secondary"><i class="bi bi-shield"></i> Room Leader Settings</h6>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="edit-leader-name">Leader Name</label>
+                        <input type="text" name="room_leader_name" id="edit-leader-name" class="form-control" value="{{ profile.room_leader_name or '' }}">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="edit-leader-phone">Leader Phone</label>
+                        <input type="text" name="room_leader_phone" id="edit-leader-phone" class="form-control" value="{{ profile.room_leader_phone or '' }}">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-3">Update Student Record</button>
+                <a href="{{ url_for('admin.list_students') }}" class="btn btn-secondary mt-3 ms-2">Back to Student List</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Dashboard - HostelOS{% endblock %}
+{% block header_title %}Staff Operations Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Active Assigned Tickets -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <h5 class="mb-4 text-primary fw-semibold"><i class="bi bi-clock-history"></i> My Active Assigned Tickets</h5>
+            
+            {% if assigned_tickets %}
+                <div class="row">
+                    {% for ticket in assigned_tickets %}
+                        <div class="col-md-6 mb-4">
+                            <div class="border rounded-4 p-4 bg-light shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <span class="badge badge-info mb-2">{{ ticket.category }}</span>
+                                        <h6 class="fw-bold mb-1">{{ ticket.title }}</h6>
+                                        <small class="text-secondary">Ticket #{{ ticket.complaint_id }} • Assigned on {{ ticket.assigned_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    </div>
+                                    <div>
+                                        {% if ticket.status == 'Assigned' %}
+                                            <span class="badge badge-info">Assigned</span>
+                                        {% elif ticket.status == 'In Progress' %}
+                                            <span class="badge badge-pending">In Progress</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <p class="text-secondary text-sm mb-3" style="min-height: 50px;">
+                                    {{ ticket.description }}
+                                </p>
+                                
+                                <div class="border-top pt-3">
+                                    <div class="row text-sm mb-3">
+                                        <div class="col-6"><strong>Student:</strong> {{ ticket.student_name }}</div>
+                                        <div class="col-6"><strong>Contact:</strong> {{ ticket.student_phone }}</div>
+                                    </div>
+                                    
+                                    <!-- Action form -->
+                                    <form action="{{ url_for('staff.update_ticket', assignment_id=ticket.assignment_id) }}" method="POST">
+                                        <div class="row">
+                                            <div class="col-6 form-group">
+                                                <label class="form-label text-xs">Update Status</label>
+                                                <select name="status" class="form-control form-control-sm" required>
+                                                    <option value="Assigned" {% if ticket.status == 'Assigned' %}selected{% endif %}>Assigned</option>
+                                                    <option value="In Progress" {% if ticket.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                                    <option value="Resolved">Resolved</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6 form-group">
+                                                <label class="form-label text-xs">Staff Resolution Notes</label>
+                                                <input type="text" name="staff_notes" class="form-control form-control-sm" value="{{ ticket.staff_notes or '' }}" placeholder="Add progress comments...">
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm w-100 mt-2">Update Ticket</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5 text-secondary">
+                    <i class="bi bi-emoji-smile text-success" style="font-size: 48px;"></i>
+                    <p class="mt-3">No active tickets assigned to you. Great job!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Resolved History -->
+    <div class="col-12">
+        <div class="card">
+            <h5 class="mb-4 text-secondary fw-semibold"><i class="bi bi-check2-circle"></i> Resolved Tickets History</h5>
+            
+            {% if resolved_tickets %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Category</th>
+                                <th>Complaint Title</th>
+                                <th>Student Details</th>
+                                <th>Assigned On</th>
+                                <th>Resolved On</th>
+                                <th>My Resolution Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in resolved_tickets %}
+                                <tr>
+                                    <td>#{{ ticket.complaint_id }}</td>
+                                    <td><span class="badge badge-info bg-light text-primary">{{ ticket.category }}</span></td>
+                                    <td class="fw-semibold">{{ ticket.title }}</td>
+                                    <td>{{ ticket.student_name }}</td>
+                                    <td>{{ ticket.assigned_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td><span class="text-success">{{ ticket.resolved_at.strftime('%Y-%m-%d %H:%M') }}</span></td>
+                                    <td>
+                                        <span class="text-secondary italic">"{{ ticket.staff_notes or 'Resolved by staff.' }}"</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-secondary text-sm">
+                    No tickets resolved in your history yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

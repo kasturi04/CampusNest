@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Students Directory - HostelOS{% endblock %}
+{% block header_title %}Resident Students Directory{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h5 class="text-primary fw-semibold m-0"><i class="bi bi-people-fill"></i> Hostel Residents Directory</h5>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('reports.download', report_type='student_list', format_type='excel') }}" class="btn btn-success btn-sm">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export Excel
+            </a>
+            <a href="{{ url_for('admin.transfer_room') }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-arrow-left-right"></i> Transfer Resident Room
+            </a>
+        </div>
+    </div>
+    
+    {% if students %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Roll Number</th>
+                        <th>Student Name</th>
+                        <th>Year</th>
+                        <th>Branch</th>
+                        <th>Room No</th>
+                        <th>College Status</th>
+                        <th>Remarks</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in students %}
+                        <tr>
+                            <td><strong>{{ entry.user.username }}</strong></td>
+                            <td class="fw-semibold">{{ entry.user.name }}</td>
+                            <td>Year {{ entry.profile.year }}</td>
+                            <td>{{ entry.profile.branch }}</td>
+                            <td>
+                                {% if entry.room %}
+                                    <span class="badge badge-info bg-light text-primary">{{ entry.room.room_number }}</span>
+                                {% else %}
+                                    <span class="text-muted text-xs">Unallocated</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.profile.collage_status and ('IN CLG' in entry.profile.collage_status.upper() or 'IN COLL' in entry.profile.collage_status.upper()) %}
+                                    <span class="badge bg-success text-white px-2 py-1 text-xs" style="font-size: 11px;">In College</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark px-2 py-1 text-xs" style="font-size: 11px;">{{ entry.profile.collage_status or 'N/A' }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="text-xs text-secondary" style="font-size: 11px;" title="{{ entry.profile.remarks }}">{{ (entry.profile.remarks or '') | truncate(35) }}</span>
+                            </td>
+                            <td>{{ entry.user.phone }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('admin.view_student_profile', user_id=entry.user.id) }}" class="btn btn-primary btn-sm py-1 px-2" style="font-size:12px;">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                    <a href="{{ url_for('admin.edit_student', user_id=entry.user.id) }}" class="btn btn-secondary btn-sm py-1 px-2" style="font-size:12px;">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    {% if entry.profile.room_id %}
+                                        <form action="{{ url_for('admin.release_room', student_id=entry.user.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to vacate room for {{ entry.user.name }}?');">
+                                            <button type="submit" class="btn btn-danger btn-sm py-1 px-2" style="font-size:12px;">
+                                                <i class="bi bi-door-open"></i> Vacate Room
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-5 text-secondary">
+            <i class="bi bi-people text-muted" style="font-size: 48px;"></i>
+            <p class="mt-3">No approved students registered in the directory.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

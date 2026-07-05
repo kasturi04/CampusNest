@@ -1,0 +1,551 @@
+{% extends 'base.html' %}
+
+{% block title %}Log in - KIET Portal{% endblock %}
+
+{% block auth_content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+    body {
+        background: radial-gradient(circle at center, rgba(5, 12, 35, 0.45) 0%, rgba(2, 4, 15, 0.99) 100%), 
+                    url("{{ url_for('static', filename='assets/login_bg_kiet.png') }}") no-repeat center center fixed !important;
+        background-size: cover !important;
+        color: #ffffff !important;
+        min-height: 100vh;
+        font-family: 'Outfit', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px !important;
+        margin: 0;
+    }
+
+    .auth-page-container {
+        max-width: 1100px;
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CAMPUSNEST Banner */
+    .brand-banner {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .brand-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 900;
+        font-size: 3.8rem;
+        letter-spacing: 5px;
+        background: linear-gradient(180deg, #ffffff 40%, #2563eb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        filter: drop-shadow(0 0 15px rgba(37, 99, 235, 0.5));
+        text-transform: uppercase;
+        line-height: 1.1;
+    }
+
+    .brand-subtitle {
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 3.5px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        margin-top: 8px;
+    }
+
+    .banner-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        color: #60a5fa;
+        font-weight: 600;
+        text-shadow: 0 0 5px rgba(96, 165, 250, 0.3);
+    }
+
+    .badge-divider {
+        width: 1px;
+        height: 14px;
+        background-color: rgba(96, 165, 250, 0.3);
+    }
+
+    /* Glassmorphic Login Card */
+    .custom-login-card {
+        width: 100%;
+        background: rgba(5, 12, 30, 0.78);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        display: grid;
+        grid-template-columns: 1.25fr 1fr;
+        gap: 40px;
+        padding: 45px;
+    }
+
+    @media (max-width: 850px) {
+        .custom-login-card {
+            grid-template-columns: 1fr;
+            gap: 35px;
+            padding: 35px 25px;
+        }
+        .brand-title {
+            font-size: 2.8rem;
+        }
+    }
+
+    .form-h2 {
+        font-size: 2.1rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: #ffffff;
+    }
+
+    .form-p {
+        font-size: 0.95rem;
+        color: #94a3b8;
+        margin-bottom: 25px;
+    }
+
+    .form-label-custom {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .input-icon-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .input-icon-left {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #3b82f6;
+        font-size: 1.1rem;
+    }
+
+    .form-input-custom {
+        width: 100%;
+        background-color: rgba(15, 23, 42, 0.65);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        border-radius: 8px;
+        padding: 11px 14px 11px 42px;
+        color: #ffffff;
+        font-size: 0.95rem;
+        transition: all 0.25s ease;
+    }
+
+    .form-input-custom:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.45);
+        background-color: rgba(15, 23, 42, 0.85);
+    }
+
+    /* Custom Checkbox */
+    .form-check {
+        padding-left: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-check-input-custom {
+        appearance: none;
+        -webkit-appearance: none;
+        background-color: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        border-radius: 4px;
+        width: 17px;
+        height: 17px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        margin-right: 8px;
+    }
+
+    .form-check-input-custom:checked {
+        background-color: #2563eb;
+        border-color: #3b82f6;
+    }
+
+    .form-check-input-custom:checked::after {
+        content: "\F26E";
+        font-family: "bootstrap-icons";
+        font-size: 11px;
+        color: white;
+        font-weight: 900;
+    }
+
+    .form-check-label-custom {
+        color: #94a3b8;
+        font-size: 0.88rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .btn-login-custom {
+        width: 100%;
+        background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+        cursor: pointer;
+    }
+
+    .btn-login-custom:hover {
+        background: linear-gradient(135deg, #1e40af, #1d4ed8);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    }
+
+    .register-link-text {
+        font-size: 0.9rem;
+        color: #94a3b8;
+    }
+
+    .register-link-text a {
+        color: #3b82f6;
+        font-weight: 700;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .register-link-text a:hover {
+        color: #60a5fa;
+        text-decoration: underline;
+    }
+
+    /* Demo Credentials */
+    .demo-box {
+        background-color: rgba(15, 23, 42, 0.45);
+        border: 1px solid rgba(59, 130, 246, 0.15);
+        border-radius: 10px;
+        padding: 15px 18px;
+    }
+
+    .demo-title {
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: #3b82f6;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .demo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    @media (max-width: 576px) {
+        .demo-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+    }
+
+    .demo-col {
+        border-right: 1px solid rgba(59, 130, 246, 0.1);
+        padding-right: 10px;
+    }
+
+    .demo-col:last-child {
+        border-right: none;
+        padding-right: 0;
+    }
+
+    .demo-role {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        display: block;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+    .demo-val {
+        font-size: 0.75rem;
+        color: #cbd5e1;
+        display: block;
+        margin-bottom: 1px;
+    }
+
+    .demo-val strong {
+        color: #ffffff;
+        user-select: all;
+    }
+
+    /* Right pane */
+    .border-start-custom {
+        border-left: 1px solid rgba(59, 130, 246, 0.15);
+        padding-left: 45px;
+    }
+
+    @media (max-width: 850px) {
+        .border-start-custom {
+            border-left: none;
+            padding-left: 0;
+            border-top: 1px solid rgba(59, 130, 246, 0.15);
+            padding-top: 30px;
+        }
+    }
+
+    .branding-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 20px;
+        letter-spacing: 0.5px;
+    }
+
+    .kiet-custom-logo-card {
+        background-color: rgba(7, 15, 38, 0.65);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 12px;
+        padding: 35px 20px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .kiet-logo-row {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 4.8rem;
+        line-height: 1;
+        font-family: 'Montserrat', Arial, sans-serif;
+        letter-spacing: -2px;
+    }
+
+    .kiet-letter {
+        display: inline-block;
+    }
+
+    .blue-k {
+        color: #1e3a8a;
+    }
+
+    .blue-i {
+        color: #1e3a8a;
+        position: relative;
+    }
+
+    .kiet-i-dot {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #050c1e;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        border: 2.5px solid #dc2626;
+        color: #dc2626;
+        font-size: 12px;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .red-e {
+        color: #dc2626;
+    }
+
+    .blue-t {
+        color: #1e3a8a;
+    }
+
+    .kiet-divider {
+        border-top: 2.5px solid #ffffff;
+        width: 210px;
+        margin: 15px auto 10px;
+    }
+
+    .kiet-sub-brand {
+        font-size: 1.15rem;
+        font-weight: 900;
+        letter-spacing: 1.5px;
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
+        text-transform: uppercase;
+    }
+
+    .kiet-approved {
+        font-size: 0.65rem;
+        color: #94a3b8;
+        margin-top: 8px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        max-width: 230px;
+        line-height: 1.4;
+    }
+
+    .alert-custom {
+        background-color: rgba(220, 38, 38, 0.15);
+        border: 1px solid rgba(220, 38, 38, 0.35);
+        color: #fca5a5;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        padding: 12px 15px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="auth-page-container">
+    <!-- CAMPUSNEST Banner -->
+    <div class="brand-banner">
+        <h1 class="brand-title">CAMPUSNEST</h1>
+        <div class="brand-subtitle">SMART HOSTEL MANAGEMENT SYSTEM</div>
+        <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap mt-3">
+            <span class="banner-badge">
+                <i class="bi bi-house-door"></i> Smart Hostel
+            </span>
+            <div class="badge-divider"></div>
+            <span class="banner-badge">
+                <i class="bi bi-people"></i> Easy Living
+            </span>
+            <div class="badge-divider"></div>
+            <span class="banner-badge">
+                <i class="bi bi-calendar4-week"></i> Better Campus
+            </span>
+        </div>
+    </div>
+
+    <!-- Glassmorphic Login Card -->
+    <div class="custom-login-card">
+        <!-- Left Column: Login Form -->
+        <div class="login-left-pane">
+            <h2 class="form-h2">Log in.</h2>
+            <p class="form-p">Use a local account to log in.</p>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert-custom d-flex align-items-center gap-2">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <div>{{ message }}</div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('auth.login') }}" method="POST">
+                <!-- Username Input -->
+                <div class="mb-3">
+                    <label for="username-input" class="form-label-custom">Roll No / Username</label>
+                    <div class="input-icon-wrapper">
+                        <i class="bi bi-person input-icon-left"></i>
+                        <input type="text" name="username" id="username-input" class="form-input-custom" placeholder="24373-CM-026" required>
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div class="mb-3">
+                    <label for="password" class="form-label-custom">Password</label>
+                    <div class="input-icon-wrapper">
+                        <i class="bi bi-lock input-icon-left"></i>
+                        <input type="password" name="password" id="password" class="form-input-custom" placeholder="••••••••••••••••••••" required>
+                    </div>
+                </div>
+
+                <!-- Remember Me Checkbox -->
+                <div class="mb-4 d-flex align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input-custom" type="checkbox" id="remember-me">
+                        <label class="form-check-label-custom" for="remember-me">
+                            Remember me?
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-login-custom">
+                    Log in <i class="bi bi-arrow-right-short ms-1 fs-5"></i>
+                </button>
+            </form>
+
+            <div class="text-start mt-3">
+                <p class="register-link-text">New Student? <a href="{{ url_for('auth.register') }}">Register Here</a></p>
+            </div>
+
+            <!-- Demo Credentials Box -->
+            <div class="demo-box mt-4">
+                <div class="demo-title">
+                    <i class="bi bi-info-circle-fill"></i> Demo Credentials for Evaluation:
+                </div>
+                <div class="demo-grid">
+                    <div class="demo-col">
+                        <span class="demo-role">Admin/Warden:</span>
+                        <span class="demo-val">Username: <strong>admin</strong></span>
+                        <span class="demo-val">Password: <strong>password123</strong></span>
+                    </div>
+                    <div>
+                        <span class="demo-role">Super Admin:</span>
+                        <span class="demo-val">Username: <strong>superadmin</strong></span>
+                        <span class="demo-val">Password: <strong>password123</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: KIET Branding & Logo -->
+        <div class="login-right-pane border-start-custom">
+            <h4 class="branding-title">KIET Group..</h4>
+
+            <!-- Large Clean Rendered KIET Logo -->
+            <div class="kiet-custom-logo-card">
+                <div class="kiet-logo-row">
+                    <span class="kiet-letter blue-k">K</span>
+                    <span class="kiet-letter blue-i">
+                        I
+                        <span class="kiet-i-dot"><i class="bi bi-check" style="font-size: 14px;"></i></span>
+                    </span>
+                    <span class="kiet-letter red-e">E</span>
+                    <span class="kiet-letter blue-t">T</span>
+                </div>
+                <div class="kiet-divider"></div>
+                <div class="kiet-sub-brand">GROUP OF INSTITUTIONS</div>
+                <div class="kiet-approved">Approved by AICTE, Govt. of A.P. & Affiliated to JNTUK</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

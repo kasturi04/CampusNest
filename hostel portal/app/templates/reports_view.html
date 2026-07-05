@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Report Viewer - HostelOS{% endblock %}
+{% block header_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- Reports Viewer Wrapper -->
+<div class="card shadow-sm border-0 p-3 rounded-3 bg-white mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 border-bottom pb-3">
+        <!-- Back to Dashboard -->
+        <a href="{{ url_for('reports.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to Reports Panel
+        </a>
+        
+        <!-- Actions & AI Summary -->
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-info text-white btn-sm" id="ai-summary-btn">
+                <i class="bi bi-robot"></i> AI Report Summary
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="printReport()">
+                <i class="bi bi-printer-fill"></i> Print Report
+            </button>
+            <a href="{{ url_for('reports.download', report_type=report_type, format_type='pdf') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-secondary btn-sm">
+                <i class="bi bi-download"></i> Download PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- Live PDF Iframe -->
+    <div class="ratio ratio-16x9 rounded-3 overflow-hidden border" style="height: 650px;">
+        <iframe id="report-iframe" src="{{ url_for('reports.pdf_stream', report_type=report_type) }}?{{ request.query_string.decode('utf-8') }}" width="100%" height="100%" style="border: none;"></iframe>
+    </div>
+</div>
+
+<!-- AI Summary Modal -->
+<div class="modal fade" id="aiSummaryModal" tabindex="-1" aria-labelledby="aiSummaryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content text-dark">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="aiSummaryModalLabel"><i class="bi bi-robot me-2"></i> AI Report Summary & Insights</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="ai-summary-loading" class="text-center py-4">
+                    <div class="spinner-border text-info" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Analyzing report data and generating summary details...</p>
+                </div>
+                <div id="ai-summary-content" class="markdown-body p-2" style="display: none; max-height: 450px; overflow-y: auto; font-size: 0.95rem; line-height: 1.6;">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function printReport() {
+        const iframe = document.getElementById('report-iframe');
+        if (iframe) {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const summaryBtn = document.getElementById('ai-summary-btn');
+        if (summaryBtn) {
+            summaryBtn.addEventListener("click", () => {
+                const modalEl = document.getElementById('aiSummaryModal');
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+
+                const loadingEl = document.getElementById('ai-summary-loading');
+                const contentEl = document.getElementById('ai-summary-content');
+
+                loadingEl.style.display = "block";
+                contentEl.style.display = "none";
+                contentEl.innerHTML = "";
+
+                // Call summarize endpoint with current filters passed as query params
+                fetch("{{ url_for('reports.summarize', report_type=report_type) }}?{{ request.query_string.decode('utf-8') }}", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    loadingEl.style.display = "none";
+                    contentEl.style.display = "block";
+                    if (data.success) {
+                        contentEl.innerHTML = parseMarkdown(data.response);
+                    } else {
+                        contentEl.innerHTML = `<div class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Failed to generate AI summary: ${data.response}</div>`;
+                    }
+                })
+                .catch(err => {
+                    loadingEl.style.display = "none";
+                    contentEl.style.display = "block";
+                    console.error("AI Summary error:", err);
+                    contentEl.innerHTML = '<div class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Error connecting to the report summarizer.</div>';
+                });
+            });
+        }
+
+        // Simple Markdown parser
+        function parseMarkdown(text) {
+            if (!text) return "";
+            let html = text;
+            html = html
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+            html = html.replace(/^### (.*?)$/gm, '<h5 class="fw-bold mt-3 mb-2 text-dark">$1</h5>');
+            html = html.replace(/^## (.*?)$/gm, '<h4 class="fw-bold mt-4 mb-2 text-primary border-bottom pb-1">$1</h4>');
+            html = html.replace(/^# (.*?)$/gm, '<h3 class="fw-bold mt-4 mb-3 text-primary border-bottom pb-2">$1</h3>');
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html = html.replace(/^\s*-\s+(.*?)$/gm, '<li class="ms-3">$1</li>');
+            html = html.replace(/^\s*\*\s+(.*?)$/gm, '<li class="ms-3">$1</li>');
+            html = html.replace(/`([^`]+)`/g, '<code class="bg-light px-1 py-0.5 rounded text-danger">$1</code>');
+            html = html.replace(/\n/g, '<br>');
+            return html;
+        }
+    });
+</script>
+{% endblock %}

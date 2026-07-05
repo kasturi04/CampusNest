@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}Room Inventory - HostelOS{% endblock %}
+{% block header_title %}Room Inventory Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Column: Add Room Form -->
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm border-0 p-3 bg-white">
+            <h5 class="mb-3 text-primary fw-semibold"><i class="bi bi-plus-circle-fill"></i> Add New Room</h5>
+            
+            <form action="{{ url_for('admin.manage_rooms') }}" method="POST">
+                <div class="mb-3">
+                    <label class="form-label text-sm text-secondary" for="room-no">Room Number</label>
+                    <input type="text" name="room_number" id="room-no" class="form-control form-control-sm" placeholder="E.g. 101, 203" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label text-sm text-secondary" for="room-floor">Floor</label>
+                    <select name="floor" id="room-floor" class="form-control form-control-sm" required>
+                        <option value="1">1st Floor (1st Year)</option>
+                        <option value="2">2nd Floor (2nd Year)</option>
+                        <option value="3">3rd Floor (3rd Year)</option>
+                        <option value="4">4th Floor (Final Year)</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label text-sm text-secondary" for="room-type">Room Type</label>
+                    <select name="room_type" id="room-type" class="form-control form-control-sm" required>
+                        <option value="Normal">Normal Rooms</option>
+                        <option value="Executive">Executive Rooms</option>
+                        <option value="AC">AC Rooms</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label text-sm text-secondary" for="room-hostel">Coordinator / Incharge</label>
+                    <select name="hostel_block" id="room-hostel" class="form-control form-control-sm" required>
+                        <option value="KEERTHI">Keerthi</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label text-sm text-secondary" for="room-capacity">Beds Capacity</label>
+                    <input type="number" name="capacity" id="room-capacity" class="form-control form-control-sm" value="8" min="1" max="12" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-plus-lg"></i> Add Room</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Right Column: Room Inventory Directory -->
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0 p-3 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="text-primary fw-semibold m-0"><i class="bi bi-house-door-fill"></i> Room Inventory & Occupancy Logs</h5>
+                <a href="{{ url_for('reports.download', report_type='occupancy', format_type='excel') }}" class="btn btn-success btn-sm">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Export Excel
+                </a>
+            </div>
+            
+            {% if rooms %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Room</th>
+                                <th>Coordinator & Floor</th>
+                                <th>Room Type</th>
+                                <th>Capacity</th>
+                                <th>Occupied / Vacant</th>
+                                <th>Room Leader</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in rooms %}
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold text-dark fs-6">Room {{ r.room.room_number }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="badge bg-primary-subtle text-primary mb-1 text-xs" style="width: fit-content;">{{ r.room.hostel_block }}</span>
+                                            <small class="text-secondary">Floor {{ r.room.floor }}</small>
+                                        </div>
+                                    </td>
+                                    <td>{{ r.room.room_type }}</td>
+                                    <td>{{ r.room.capacity }} Beds</td>
+                                    <td>
+                                        <div class="d-flex flex-column gap-1">
+                                            <div class="d-flex justify-content-between text-xs font-semibold">
+                                                <span>Occupied: {{ r.occupied_beds }}</span>
+                                                <span class="text-success">Vacant: {{ r.available_beds }}</span>
+                                            </div>
+                                            <div class="progress" style="height: 6px; border-radius: 3px;">
+                                                <div class="progress-bar {% if r.occupied_beds == r.total_beds %}bg-danger{% else %}bg-primary{% endif %}" role="progressbar" 
+                                                     style="width: {{ (r.occupied_beds / r.total_beds * 100) if r.total_beds > 0 else 0 }}%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% set ns = namespace(leader_name='N/A', leader_phone='N/A') %}
+                                        {% for resident in r.room.residents %}
+                                            {% if resident.user.status == 'approved' and resident.room_leader_name and resident.room_leader_name != 'N/A' %}
+                                                {% set ns.leader_name = resident.room_leader_name %}
+                                                {% set ns.leader_phone = resident.room_leader_phone %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <div class="d-flex flex-column text-xs">
+                                            <span class="fw-semibold text-dark">{{ ns.leader_name }}</span>
+                                            {% if ns.leader_phone != 'N/A' %}
+                                                <span class="text-secondary"><i class="bi bi-telephone-fill text-muted me-1"></i>{{ ns.leader_phone }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if r.room.status == 'Available' %}
+                                            <span class="badge bg-success-subtle text-success">Available</span>
+                                        {% elif r.room.status == 'Full' %}
+                                            <span class="badge bg-danger-subtle text-danger">Full</span>
+                                        {% elif r.room.status == 'Reserved' %}
+                                            <span class="badge bg-info-subtle text-info">Reserved</span>
+                                        {% elif r.room.status == 'Maintenance' %}
+                                            <span class="badge bg-warning-subtle text-warning">Maintenance</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                            <!-- View Occupants Trigger -->
+                                            <button class="btn btn-outline-primary btn-xs py-1 px-2" onclick="toggleResidents({{ r.room.id }})" style="font-size: 11px;">
+                                                <i class="bi bi-people-fill"></i> View Residents
+                                            </button>
+                                            
+                                            <!-- Transfer Student Button -->
+                                            <a href="{{ url_for('admin.transfer_room') }}?room_number={{ r.room.room_number }}" class="btn btn-outline-secondary btn-xs py-1 px-2" style="font-size: 11px;">
+                                                <i class="bi bi-arrow-left-right"></i> Transfer
+                                            </a>
+                                            
+                                            <!-- Logs Links -->
+                                            <a href="{{ url_for('reports.view_report', report_type='attendance') }}?room_number={{ r.room.room_number }}" class="btn btn-light btn-xs py-1 px-2 text-secondary" style="font-size: 11px;" title="View Attendance Logs">
+                                                <i class="bi bi-calendar-check"></i> Att.
+                                            </a>
+                                            <a href="{{ url_for('reports.view_report', report_type='complaint') }}?room_number={{ r.room.room_number }}" class="btn btn-light btn-xs py-1 px-2 text-secondary" style="font-size: 11px;" title="View Complaints">
+                                                <i class="bi bi-wrench"></i> Comp.
+                                            </a>
+                                            
+                                            <!-- Edit Room -->
+                                            <a href="{{ url_for('admin.edit_room', room_id=r.room.id) }}" class="btn btn-secondary btn-xs py-1 px-2" style="font-size: 11px;">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </a>
+                                            
+                                            <!-- Delete Room -->
+                                            <form action="{{ url_for('admin.delete_room', room_id=r.room.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete room {{ r.room.room_number }}?');" class="d-inline">
+                                                <button type="submit" class="btn btn-danger btn-xs py-1 px-2" style="font-size: 11px;">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Collapsible Residents List Row -->
+                                <tr id="residents-row-{{ r.room.id }}" style="display: none; background-color: #f8fafc;">
+                                    <td colspan="8" class="p-3">
+                                        <div class="p-2 border rounded bg-white">
+                                            <h6 class="fw-bold text-primary mb-2 text-xs"><i class="bi bi-person-fill-check"></i> Assigned Students (Room {{ r.room.room_number }} occupants)</h6>
+                                            {% set has_residents = false %}
+                                            <ul class="mb-0 ps-3 text-xs row">
+                                                {% for resident in r.room.residents %}
+                                                    {% if resident.user.status == 'approved' %}
+                                                        {% set has_residents = true %}
+                                                        <li class="col-md-6 mb-1">
+                                                            <a href="{{ url_for('admin.edit_student', user_id=resident.user.id) }}" class="fw-semibold text-primary">
+                                                                {{ resident.user.name }} ({{ resident.user.username }})
+                                                            </a> 
+                                                            <span class="text-secondary">- {{ resident.branch }} (Year {{ resident.year }}) | Phone: {{ resident.user.phone }}</span>
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                            {% if not has_residents %}
+                                                <span class="text-muted text-xs ms-2"><i class="bi bi-info-circle me-1"></i>No approved students are currently assigned to this room.</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5 text-secondary">
+                    <i class="bi bi-info-circle fs-3 d-block mb-2"></i> No rooms configured in the system yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleResidents(roomId) {
+        const row = document.getElementById('residents-row-' + roomId);
+        if (row) {
+            row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+        }
+    }
+</script>
+{% endblock %}

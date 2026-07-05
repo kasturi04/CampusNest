@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports Panel - HostelOS{% endblock %}
+{% block header_title %}Reports & Exports Panel{% endblock %}
+
+{% block content %}
+<!-- Search & Filter Reports Form -->
+<div class="card shadow-sm border-0 p-3 rounded-3 bg-white mb-4">
+    <h5 class="fw-bold mb-3 text-secondary"><i class="bi bi-funnel-fill"></i> Filter Reports & Live Preview Data</h5>
+    <form id="filter-form">
+        <div class="row g-2">
+            <div class="col-md-3">
+                <label for="filter-student-name" class="form-label text-xs text-secondary mb-1">Student Name</label>
+                <input type="text" id="filter-student-name" class="form-control form-control-sm" placeholder="e.g. Aditya">
+            </div>
+            <div class="col-md-3">
+                <label for="filter-roll-number" class="form-label text-xs text-secondary mb-1">Roll / Hall Ticket Number</label>
+                <input type="text" id="filter-roll-number" class="form-control form-control-sm" placeholder="e.g. 26B21A0501">
+            </div>
+            <div class="col-md-2">
+                <label for="filter-room-number" class="form-label text-xs text-secondary mb-1">Room Number</label>
+                <input type="text" id="filter-room-number" class="form-control form-control-sm" placeholder="e.g. 106">
+            </div>
+            <div class="col-md-2">
+                <label for="filter-branch" class="form-label text-xs text-secondary mb-1">Branch</label>
+                <input type="text" id="filter-branch" class="form-control form-control-sm" placeholder="e.g. CSM">
+            </div>
+            <div class="col-md-2">
+                <label for="filter-year" class="form-label text-xs text-secondary mb-1">Year of Study</label>
+                <select id="filter-year" class="form-control form-control-sm">
+                    <option value="">All Years</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                </select>
+            </div>
+        </div>
+        <div class="row g-2 mt-2 align-items-end">
+            <div class="col-md-3">
+                <label for="filter-block" class="form-label text-xs text-secondary mb-1">Coordinator / Incharge</label>
+                <select id="filter-block" class="form-control form-control-sm">
+                    <option value="">All Coordinators</option>
+                    <option value="KEERTHI">Keerthi</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filter-date" class="form-label text-xs text-secondary mb-1">Attendance Date (Attendance logs only)</label>
+                <input type="date" id="filter-date" class="form-control form-control-sm">
+            </div>
+            <div class="col-md-3">
+                <label for="filter-status" class="form-label text-xs text-secondary mb-1">Complaint Status (Complaints logs only)</label>
+                <select id="filter-status" class="form-control form-control-sm">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Assigned">Assigned</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="button" class="btn btn-secondary btn-sm w-50" onclick="clearFilters()">
+                    <i class="bi bi-x-circle"></i> Clear
+                </button>
+                <button type="button" class="btn btn-primary btn-sm w-50" onclick="applyFilters()">
+                    <i class="bi bi-check-circle"></i> Apply Filters
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Report Cards -->
+<div class="row">
+    <!-- Student List Report -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm border-0 p-3 bg-white">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="bg-primary-subtle text-primary p-3 rounded-3" style="font-size: 24px;">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1">Student Directory Report</h5>
+                    <p class="text-secondary text-sm mb-0">List of all registered students, their contact numbers, parents' phone numbers, and room numbers.</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-auto pt-3 border-top">
+                <button type="button" onclick="viewReport('student_list')" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="bi bi-eye-fill"></i> View PDF Viewer
+                </button>
+                <button type="button" onclick="exportExcel('student_list')" class="btn btn-outline-success btn-sm flex-grow-1">
+                    <i class="bi bi-filetype-xlsx"></i> Export Excel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Room Occupancy Report -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm border-0 p-3 bg-white">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="bg-success-subtle text-success p-3 rounded-3" style="font-size: 24px;">
+                    <i class="bi bi-house-door-fill"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1">Room Occupancy Report</h5>
+                    <p class="text-secondary text-sm mb-0">Summary of all hostel floors, rooms, room types (AC, Executive, Normal), total capacity, occupied slots, and vacancies.</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-auto pt-3 border-top">
+                <button type="button" onclick="viewReport('occupancy')" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="bi bi-eye-fill"></i> View PDF Viewer
+                </button>
+                <button type="button" onclick="exportExcel('occupancy')" class="btn btn-outline-success btn-sm flex-grow-1">
+                    <i class="bi bi-filetype-xlsx"></i> Export Excel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Attendance Report -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm border-0 p-3 bg-white">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="bg-warning-subtle text-warning p-3 rounded-3" style="font-size: 24px;">
+                    <i class="bi bi-calendar-check-fill"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1">Attendance Log Report</h5>
+                    <p class="text-secondary text-sm mb-0">Roll logs of student attendance details, status (Present, Absent, Leave) filtered chronologically, and warden remarks.</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-auto pt-3 border-top">
+                <button type="button" onclick="viewReport('attendance')" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="bi bi-eye-fill"></i> View PDF Viewer
+                </button>
+                <button type="button" onclick="exportExcel('attendance')" class="btn btn-outline-success btn-sm flex-grow-1">
+                    <i class="bi bi-filetype-xlsx"></i> Export Excel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Complaints Report -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm border-0 p-3 bg-white">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="bg-info-subtle text-info p-3 rounded-3" style="font-size: 24px;">
+                    <i class="bi bi-wrench-adjustable"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1">Maintenance Complaints Report</h5>
+                    <p class="text-secondary text-sm mb-0">Listing of filed tickets, categories (Electrical, Plumbing, etc.), status logs, assigned technician profiles, and resolution days.</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-auto pt-3 border-top">
+                <button type="button" onclick="viewReport('complaint')" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="bi bi-eye-fill"></i> View PDF Viewer
+                </button>
+                <button type="button" onclick="exportExcel('complaint')" class="btn btn-outline-success btn-sm flex-grow-1">
+                    <i class="bi bi-filetype-xlsx"></i> Export Excel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getQueryString() {
+        const params = new URLSearchParams();
+        const name = document.getElementById('filter-student-name').value.trim();
+        const roll = document.getElementById('filter-roll-number').value.trim();
+        const room = document.getElementById('filter-room-number').value.trim();
+        const branch = document.getElementById('filter-branch').value.trim();
+        const year = document.getElementById('filter-year').value;
+        const block = document.getElementById('filter-block').value;
+        const date = document.getElementById('filter-date').value;
+        const status = document.getElementById('filter-status').value;
+        
+        if (name) params.append('student_name', name);
+        if (roll) params.append('roll_number', roll);
+        if (room) params.append('room_number', room);
+        if (branch) params.append('branch', branch);
+        if (year) params.append('year', year);
+        if (block) params.append('block', block);
+        if (date) params.append('date', date);
+        if (status) params.append('status', status);
+        
+        return params.toString();
+    }
+
+    function viewReport(reportType) {
+        const qs = getQueryString();
+        window.location.href = `/reports/view/${reportType}` + (qs ? '?' + qs : '');
+    }
+
+    function exportExcel(reportType) {
+        const qs = getQueryString();
+        window.location.href = `/reports/download/${reportType}/excel` + (qs ? '?' + qs : '');
+    }
+
+    function clearFilters() {
+        document.getElementById('filter-form').reset();
+    }
+
+    function applyFilters() {
+        const name = document.getElementById('filter-student-name').value.trim();
+        const roll = document.getElementById('filter-roll-number').value.trim();
+        const room = document.getElementById('filter-room-number').value.trim();
+        const branch = document.getElementById('filter-branch').value.trim();
+        const year = document.getElementById('filter-year').value;
+        const block = document.getElementById('filter-block').value;
+        const date = document.getElementById('filter-date').value;
+        const status = document.getElementById('filter-status').value;
+        
+        let message = "Filters set: ";
+        let active = [];
+        if (name) active.push("Name=" + name);
+        if (roll) active.push("Roll=" + roll);
+        if (room) active.push("Room=" + room);
+        if (branch) active.push("Branch=" + branch);
+        if (year) active.push("Year=" + year);
+        if (block) active.push("Block=" + block);
+        if (date) active.push("Date=" + date);
+        if (status) active.push("Status=" + status);
+        
+        if (active.length > 0) {
+            message += active.join(", ");
+        } else {
+            message = "No filters active (showing complete database records).";
+        }
+        
+        alert(message + "\nClick 'View PDF Viewer' or 'Export Excel' on any card to get the filtered report.");
+    }
+</script>
+{% endblock %}

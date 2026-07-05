@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Analytics - HostelOS{% endblock %}
+{% block header_title %}Attendance Insights & Analytics{% endblock %}
+
+{% block content %}
+<!-- Overall Today KPIs -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card kpi-card shadow-sm border-0 p-3 bg-white text-dark rounded-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary-subtle text-primary p-3 rounded-circle" style="font-size: 20px;">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary text-sm mb-1">Total Students</h6>
+                    <h4 class="fw-bold mb-0">{{ overall.total }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card shadow-sm border-0 p-3 bg-white text-dark rounded-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-success-subtle text-success p-3 rounded-circle" style="font-size: 20px;">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary text-sm mb-1">Present Today</h6>
+                    <h4 class="fw-bold mb-0 text-success">{{ overall.present }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card shadow-sm border-0 p-3 bg-white text-dark rounded-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-danger-subtle text-danger p-3 rounded-circle" style="font-size: 20px;">
+                    <i class="bi bi-person-x-fill"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary text-sm mb-1">Absent Today</h6>
+                    <h4 class="fw-bold mb-0 text-danger">{{ overall.absent }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card shadow-sm border-0 p-3 bg-white text-dark rounded-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-info-subtle text-info p-3 rounded-circle" style="font-size: 20px;">
+                    <i class="bi bi-percent"></i>
+                </div>
+                <div>
+                    <h6 class="text-secondary text-sm mb-1">Attendance Today</h6>
+                    <h4 class="fw-bold mb-0 text-primary">{{ overall.pct }}%</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Year-wise Attendance Cards -->
+<h5 class="fw-bold mb-3 text-secondary"><i class="bi bi-calendar3-range"></i> Year-wise Attendance</h5>
+<div class="row mb-4">
+    {% for yr, stats in year_stats.items() %}
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 p-3 rounded-3 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold text-primary mb-0">
+                    {% if yr == 1 %}1st Year{% elif yr == 2 %}2nd Year{% elif yr == 3 %}3rd Year{% else %}Final Year{% endif %}
+                </h6>
+                <span class="badge bg-primary-subtle text-primary">{{ stats.pct }}%</span>
+            </div>
+            <div class="row text-center mt-2 border-top pt-2">
+                <div class="col-4 border-end">
+                    <small class="text-secondary text-xs d-block">Total</small>
+                    <span class="fw-semibold text-sm">{{ stats.total }}</span>
+                </div>
+                <div class="col-4 border-end">
+                    <small class="text-secondary text-xs d-block text-success">Pres</small>
+                    <span class="fw-semibold text-sm text-success">{{ stats.present }}</span>
+                </div>
+                <div class="col-4">
+                    <small class="text-secondary text-xs d-block text-danger">Abs</small>
+                    <span class="fw-semibold text-sm text-danger">{{ stats.absent }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Floor-wise Comparison Row -->
+<div class="row mb-4">
+    <!-- Floor Attendance -->
+    <div class="col-12">
+        <div class="card shadow-sm border-0 p-3 rounded-3 bg-white">
+            <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-layers"></i> Floor-wise Attendance</h6>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm align-middle text-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Floor</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-center">Present</th>
+                            <th class="text-center">Absent</th>
+                            <th class="text-end">Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flr, stats in floor_stats.items() %}
+                        <tr>
+                            <td class="fw-semibold">
+                                {% if flr == 0 %}Ground Floor{% elif flr == 1 %}1st Floor{% elif flr == 2 %}2nd Floor{% elif flr == 3 %}3rd Floor{% else %}4th Floor{% endif %}
+                            </td>
+                            <td class="text-center">{{ stats.total }}</td>
+                            <td class="text-center text-success">{{ stats.present }}</td>
+                            <td class="text-center text-danger">{{ stats.absent }}</td>
+                            <td class="text-end fw-bold text-primary">{{ stats.pct }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grid for 5 Interactive Charts -->
+<h5 class="fw-bold mb-3 text-secondary"><i class="bi bi-pie-chart"></i> Visual Comparisons & Trends</h5>
+<div class="row mb-4">
+    <!-- Year-wise Comparison Bar -->
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 p-3 rounded-3 bg-white h-100">
+            <h6 class="fw-bold text-secondary mb-2 text-center">Attendance Rate by Year</h6>
+            <div style="height: 200px; position: relative;">
+                <canvas id="chartYear"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floor-wise Comparison Bar -->
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 p-3 rounded-3 bg-white h-100">
+            <h6 class="fw-bold text-secondary mb-2 text-center">Attendance Rate by Floor</h6>
+            <div style="height: 200px; position: relative;">
+                <canvas id="chartFloor"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Block-wise Comparison Doughnut -->
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 p-3 rounded-3 bg-white h-100">
+            <h6 class="fw-bold text-secondary mb-2 text-center">Attendance by Block</h6>
+            <div style="height: 200px; position: relative;">
+                <canvas id="chartBlock"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Attendance Trend Line -->
+    <div class="col-md-8 mb-3">
+        <div class="card shadow-sm border-0 p-3 rounded-3 bg-white h-100">
+            <h6 class="fw-bold text-secondary mb-2">7-Day Attendance Trend (%)</h6>
+            <div style="height: 200px; position: relative;">
+                <canvas id="chartTrend"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Present vs Absent Pie -->
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 p-3 rounded-3 bg-white h-100">
+            <h6 class="fw-bold text-secondary mb-2 text-center">Present vs Absent (Today)</h6>
+            <div style="height: 200px; position: relative;">
+                <canvas id="chartPie"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Room-wise Absentees Directory -->
+<div class="card shadow-sm border-0 p-3 rounded-3 bg-white mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-primary mb-0"><i class="bi bi-door-closed"></i> Room-wise Absentees Directory</h5>
+        <a href="{{ url_for('reports.download', report_type='attendance', format_type='excel') }}" class="btn btn-success btn-sm">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Export Excel
+        </a>
+    </div>
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-hover table-bordered table-sm align-middle text-sm">
+            <thead class="table-light sticky-top">
+                <tr>
+                    <th>Room Number</th>
+                    <th class="text-center">Total Beds</th>
+                    <th class="text-center">Occupied</th>
+                    <th class="text-center">Vacant Beds</th>
+                    <th class="text-center">Present Today</th>
+                    <th class="text-center">Absent Today</th>
+                    <th>Names / Roll Numbers of Absentees</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in room_stats %}
+                <tr class="{% if r.absent > 0 %}table-danger-subtle{% endif %}">
+                    <td class="fw-bold text-center bg-light">Room {{ r.room_number }}</td>
+                    <td class="text-center">{{ r.capacity }}</td>
+                    <td class="text-center">{{ r.residents_count }}</td>
+                    <td class="text-center text-secondary">{{ r.vacant_beds }}</td>
+                    <td class="text-center text-success fw-semibold">{{ r.present }}</td>
+                    <td class="text-center text-danger fw-bold">{{ r.absent }}</td>
+                    <td>
+                        {% if r.absent_students %}
+                            {% for student in r.absent_students %}
+                                <span class="badge bg-danger p-1.5 me-1 d-inline-block text-start mb-1" style="font-size: 0.75rem;">
+                                    <i class="bi bi-person-fill"></i> {{ student.name }} ({{ student.roll_number }})
+                                </span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted text-xs"><i class="bi bi-check-circle-fill text-success me-1"></i>All Present</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Script to Render Charts -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Colors palette
+        const colorsList = {
+            blue: 'rgba(37, 99, 235, 0.8)',
+            green: 'rgba(16, 185, 129, 0.8)',
+            yellow: 'rgba(245, 158, 11, 0.8)',
+            red: 'rgba(239, 68, 68, 0.8)',
+            purple: 'rgba(139, 92, 246, 0.8)',
+            borderBlue: '#2563eb',
+            borderGreen: '#10b981',
+            borderYellow: '#f59e0b',
+            borderRed: '#ef4444',
+            borderPurple: '#8b5cf6'
+        };
+
+        // 1. Year Rate Chart
+        new Chart(document.getElementById('chartYear').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['1st Year', '2nd Year', '3rd Year', 'Final Year'],
+                datasets: [{
+                    label: 'Rate (%)',
+                    data: [
+                        {{ year_stats[1].pct }},
+                        {{ year_stats[2].pct }},
+                        {{ year_stats[3].pct }},
+                        {{ year_stats[4].pct }}
+                    ],
+                    backgroundColor: [colorsList.blue, colorsList.green, colorsList.yellow, colorsList.purple],
+                    borderColor: [colorsList.borderBlue, colorsList.borderGreen, colorsList.borderYellow, colorsList.borderPurple],
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { min: 0, max: 100 } }
+            }
+        });
+
+        // 2. Floor Rate Chart
+        new Chart(document.getElementById('chartFloor').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['1st Flr', '2nd Flr', '3rd Flr', '4th Flr'],
+                datasets: [{
+                    label: 'Rate (%)',
+                    data: [
+                        {{ floor_stats[1].pct }},
+                        {{ floor_stats[2].pct }},
+                        {{ floor_stats[3].pct }},
+                        {{ floor_stats[4].pct }}
+                    ],
+                    backgroundColor: colorsList.blue,
+                    borderColor: colorsList.borderBlue,
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { min: 0, max: 100 } }
+            }
+        });
+
+        // 3. Coordinator Rate Chart
+        const blockNames = {{ block_stats.keys()|list|tojson }};
+        const blockRates = [
+            {% for blk, stats in block_stats.items() %}
+                {{ stats.pct }},
+            {% endfor %}
+        ];
+        new Chart(document.getElementById('chartBlock').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: blockNames,
+                datasets: [{
+                    data: blockRates,
+                    backgroundColor: [colorsList.blue, colorsList.green, colorsList.yellow],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // 4. Trend Line Chart
+        new Chart(document.getElementById('chartTrend').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {{ trend_labels|tojson }},
+                datasets: [{
+                    label: 'Present %',
+                    data: {{ trend_data|tojson }},
+                    fill: true,
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderColor: colorsList.borderBlue,
+                    borderWidth: 2,
+                    tension: 0.15,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { min: 0, max: 100 } }
+            }
+        });
+
+        // 5. Present vs Absent Pie Chart
+        new Chart(document.getElementById('chartPie').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: ['Present', 'Absent'],
+                datasets: [{
+                    data: [{{ overall.present }}, {{ overall.absent }}],
+                    backgroundColor: [colorsList.green, colorsList.red],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    });
+</script>
+{% endblock %}

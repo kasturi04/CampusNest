@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+
+{% block title %}HostelOS - Student Registration{% endblock %}
+
+{% block auth_content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+    body {
+        background: radial-gradient(circle at center, rgba(5, 12, 35, 0.45) 0%, rgba(2, 4, 15, 0.99) 100%), 
+                    url("{{ url_for('static', filename='assets/login_bg_kiet.png') }}") no-repeat center center fixed !important;
+        background-size: cover !important;
+        color: #ffffff !important;
+        min-height: 100vh;
+        font-family: 'Outfit', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px !important;
+        margin: 0;
+    }
+
+    .auth-page-container {
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CAMPUSNEST Banner */
+    .brand-banner {
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .brand-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 900;
+        font-size: 3.5rem;
+        letter-spacing: 5px;
+        background: linear-gradient(180deg, #ffffff 40%, #2563eb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        filter: drop-shadow(0 0 15px rgba(37, 99, 235, 0.5));
+        text-transform: uppercase;
+        line-height: 1.1;
+    }
+
+    .brand-subtitle {
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 3.5px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        margin-top: 8px;
+    }
+
+    /* Glassmorphic Registration Card */
+    .custom-register-card {
+        width: 100%;
+        background: rgba(5, 12, 30, 0.78);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 40px;
+    }
+
+    @media (max-width: 768px) {
+        .custom-register-card {
+            padding: 30px 20px;
+        }
+        .brand-title {
+            font-size: 2.5rem;
+        }
+    }
+
+    .form-h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: #ffffff;
+    }
+
+    .form-p {
+        font-size: 0.92rem;
+        color: #94a3b8;
+        margin-bottom: 25px;
+    }
+
+    .form-section-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #60a5fa;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label-custom {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #cbd5e1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-input-custom {
+        width: 100%;
+        background-color: rgba(15, 23, 42, 0.65);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: #ffffff;
+        font-size: 0.95rem;
+        transition: all 0.25s ease;
+    }
+
+    .form-input-custom:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.45);
+        background-color: rgba(15, 23, 42, 0.85);
+    }
+
+    .form-input-custom:disabled {
+        background-color: rgba(15, 23, 42, 0.3);
+        border-color: rgba(59, 130, 246, 0.1);
+        color: #64748b;
+    }
+
+    /* custom dropdown design */
+    select.form-input-custom {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23cbd5e1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        background-size: 12px;
+        padding-right: 40px;
+    }
+
+    .btn-register-custom {
+        width: 100%;
+        background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+        cursor: pointer;
+        margin-top: 30px;
+    }
+
+    .btn-register-custom:hover {
+        background: linear-gradient(135deg, #1e40af, #1d4ed8);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    }
+
+    .login-link-text {
+        font-size: 0.9rem;
+        color: #94a3b8;
+        margin-top: 25px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(59, 130, 246, 0.15);
+    }
+
+    .login-link-text a {
+        color: #3b82f6;
+        font-weight: 700;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .login-link-text a:hover {
+        color: #60a5fa;
+        text-decoration: underline;
+    }
+
+    .alert-custom {
+        background-color: rgba(220, 38, 38, 0.15);
+        border: 1px solid rgba(220, 38, 38, 0.35);
+        color: #fca5a5;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        padding: 12px 15px;
+        margin-bottom: 20px;
+    }
+
+    .suggestion-box {
+        background-color: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        border-radius: 8px;
+        padding: 12px 15px;
+        color: #93c5fd;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="auth-page-container">
+    <!-- CAMPUSNEST Banner -->
+    <div class="brand-banner">
+        <h1 class="brand-title">CAMPUSNEST</h1>
+        <div class="brand-subtitle">SMART HOSTEL MANAGEMENT SYSTEM</div>
+    </div>
+
+    <!-- Glassmorphic Registration Card -->
+    <div class="custom-register-card">
+        <h3 class="form-h3">Student Portal Registration</h3>
+        <p class="form-p">Enter your details to request hostel room allocation.</p>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert-custom d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div>{{ message }}</div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('auth.register') }}" method="POST" id="registration-form">
+            <!-- Role Selection -->
+            <div class="mb-4">
+                <label for="role-select-reg" class="form-label-custom"><i class="bi bi-person-badge-fill text-blue"></i> Register as:</label>
+                <select name="role" id="role-select-reg" class="form-input-custom" onchange="toggleRegistrationRole(this.value)">
+                    <option value="student">Student</option>
+                    <option value="admin">Admin / Warden</option>
+                </select>
+            </div>
+
+            <!-- Personal Details Section -->
+            <div class="form-section-title">
+                <i class="bi bi-person-fill"></i> Personal Details
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label-custom" for="name-input">Full Name</label>
+                    <input type="text" name="student_name" id="name-input" class="form-input-custom" placeholder="E.g. Jane Doe" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label-custom" for="phone-input" id="phone-label">Student Phone Number</label>
+                    <input type="text" name="phone_number" id="phone-input" class="form-input-custom" placeholder="10-digit number" required>
+                </div>
+            </div>
+
+            <!-- Admin Fields -->
+            <div id="admin-fields" class="row g-3 mt-1 d-none">
+                <div class="col-md-12">
+                    <label class="form-label-custom" for="username-input-reg">Admin Username</label>
+                    <input type="text" name="username" id="username-input-reg" class="form-input-custom" placeholder="Enter custom username (e.g. warden_smith)">
+                </div>
+            </div>
+            
+            <!-- Student Fields -->
+            <div id="student-fields">
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <label class="form-label-custom" for="parent-phone-input">Parent/Guardian Phone Number</label>
+                        <input type="text" name="parent_phone_number" id="parent-phone-input" class="form-input-custom" placeholder="Parent phone number" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom" for="roll-input">Roll Number</label>
+                        <input type="text" name="roll_number" id="roll-input" class="form-input-custom" placeholder="E.g. BT19CSE040" required>
+                    </div>
+                </div>
+                
+                <!-- Academic Details Section -->
+                <div class="form-section-title">
+                    <i class="bi bi-book-fill"></i> Academic Details
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label-custom" for="branch-select">Branch / Department</label>
+                        <select name="branch" id="branch-select" class="form-input-custom" required>
+                            <option value="CSM">CSM</option>
+                            <option value="CAI">CAI</option>
+                            <option value="AID">AID</option>
+                            <option value="CSD">CSD</option>
+                            <option value="Cyber">Cyber</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom" for="year-select">Academic Year</label>
+                        <select name="year" id="year-select" class="form-input-custom" required>
+                            <option value="" disabled selected>Select study year</option>
+                            <option value="1">1st Year (New Admission)</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year (Final Year)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Room Selection Section -->
+                <div class="form-section-title">
+                    <i class="bi bi-house-door-fill"></i> Room Selection
+                </div>
+                
+                <div class="mb-3">
+                    <div id="allocation-suggestion-text" class="suggestion-box">
+                        <i class="bi bi-info-circle-fill"></i> Please select your academic year to view available rooms.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label-custom" for="room-number-select">Room Number</label>
+                    <select name="room_number" id="room-number-select" class="form-input-custom" required disabled>
+                        <option value="" disabled selected>Select Academic Year first</option>
+                    </select>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label-custom" for="leader-name">Room Leader Name (Optional)</label>
+                        <input type="text" name="room_leader_name" id="leader-name" class="form-input-custom" placeholder="Room leader's name">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom" for="leader-phone">Room Leader Phone (Optional)</label>
+                        <input type="text" name="room_leader_phone_number" id="leader-phone" class="form-input-custom" placeholder="Room leader's phone">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Password Security Section -->
+            <div class="form-section-title">
+                <i class="bi bi-shield-lock-fill"></i> Password Security
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label-custom" for="password">Password</label>
+                    <input type="password" name="password" id="password" class="form-input-custom" placeholder="••••••••" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label-custom" for="confirm_password">Confirm Password</label>
+                    <input type="password" name="confirm_password" id="confirm_password" class="form-input-custom" placeholder="••••••••" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-register-custom">
+                Submit Registration Request <i class="bi bi-arrow-right-short ms-1 fs-5"></i>
+            </button>
+        </form>
+        
+        <div class="text-center login-link-text">
+            <p class="mb-0">Already registered? <a href="{{ url_for('auth.login') }}">Log In</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleRegistrationRole(role) {
+        const studentFieldsDiv = document.getElementById('student-fields');
+        const adminFieldsDiv = document.getElementById('admin-fields');
+        const phoneLabel = document.getElementById('phone-label');
+        
+        const studentInputs = studentFieldsDiv.querySelectorAll('input, select');
+        const adminInputs = adminFieldsDiv.querySelectorAll('input');
+
+        if (role === 'student') {
+            studentFieldsDiv.classList.remove('d-none');
+            adminFieldsDiv.classList.add('d-none');
+            phoneLabel.textContent = 'Student Phone Number';
+            
+            studentInputs.forEach(input => {
+                if (input.id !== 'leader-name' && input.id !== 'leader-phone') {
+                    input.required = true;
+                }
+            });
+            
+            adminInputs.forEach(input => {
+                input.required = false;
+            });
+        } else {
+            studentFieldsDiv.classList.add('d-none');
+            adminFieldsDiv.classList.remove('d-none');
+            phoneLabel.textContent = 'Admin Phone Number';
+            
+            studentInputs.forEach(input => {
+                input.required = false;
+            });
+            
+            adminInputs.forEach(input => {
+                input.required = true;
+            });
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const roleSelect = document.getElementById('role-select-reg');
+        if (roleSelect) {
+            toggleRegistrationRole(roleSelect.value);
+        }
+    });
+</script>
+{% endblock %}

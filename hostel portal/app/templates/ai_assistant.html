@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Assistant - HostelOS{% endblock %}
+{% block header_title %}AI Hostel Assistant (RAG Engine){% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Column: Chat Area -->
+    <div class="col-lg-8 mb-4">
+        <div class="chat-container">
+            <!-- Chat Header & Mode Select -->
+            <div class="chat-header">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-primary" style="font-size: 20px;"><i class="bi bi-robot"></i></span>
+                    <span class="fw-semibold">HostelOS Assistant</span>
+                </div>
+                <div>
+                    <label class="text-xs text-secondary me-2 fw-semibold" for="ai-mode-select">Assistant Mode:</label>
+                    <select id="ai-mode-select" class="form-control d-inline-block form-control-sm" style="width: 220px;" onchange="updateModePrompts(this.value)">
+                        <option value="hostel_knowledge" {% if current_mode == 'hostel_knowledge' %}selected{% endif %}>Rules & Handbook Guide</option>
+                        <option value="admission" {% if current_mode == 'admission' %}selected{% endif %}>Admissions & Document Helper</option>
+                        <option value="complaint_guidance" {% if current_mode == 'complaint_guidance' %}selected{% endif %}>Complaint & Maintenance Helper</option>
+                        <option value="room_recommendation" {% if current_mode == 'room_recommendation' %}selected{% endif %}>Room Recommendation Explainer</option>
+                        <option value="notices" {% if current_mode == 'notices' %}selected{% endif %}>Notice Board Clarifier</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Messages Frame -->
+            <div class="chat-messages" id="chat-box">
+                <div class="message message-ai">
+                    Hello! I am your HostelOS AI Assistant. I have read the official hostel handbooks, leaves, and visitors policies.<br><br>
+                    Select an <strong>Assistant Mode</strong> above to query a specific handbook, or click one of the suggested prompts on the right to get started. How can I help you today?
+                </div>
+            </div>
+            
+            <!-- Input Area -->
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" class="form-control" placeholder="Ask a question about hostel policies..." autocomplete="off">
+                <button id="chat-send-btn" class="btn btn-primary"><i class="bi bi-send-fill"></i> Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column: Quick Suggestions -->
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <h5 class="text-primary fw-semibold mb-3"><i class="bi bi-lightbulb"></i> Suggested Questions</h5>
+            <p class="text-secondary text-sm mb-3">Click on any prompt below to query the AI assistant immediately with targeted context:</p>
+            
+            <div id="quick-prompts-container" class="d-grid gap-2">
+                <!-- Will be dynamically updated by JS, seeding defaults first -->
+                <button class="btn btn-secondary text-start btn-sm py-2 px-3 quick-prompt" data-prompt="What is the curfew time for students in the evening?">
+                    What is the curfew time?
+                </button>
+                <button class="btn btn-secondary text-start btn-sm py-2 px-3 quick-prompt" data-prompt="Can I use heavy electric appliances like heaters or irons in my room?">
+                    Are heaters/irons allowed in rooms?
+                </button>
+                <button class="btn btn-secondary text-start btn-sm py-2 px-3 quick-prompt" data-prompt="What are the silent hours rules?">
+                    What are the silent hours?
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const promptData = {
+        hostel_knowledge: [
+            { label: "What is the curfew time?", text: "What is the curfew time for students in the evening?" },
+            { label: "Are heaters/irons allowed?", text: "Can I use heavy electric appliances like heaters or irons in my room?" },
+            { label: "What are the silent hours?", text: "What are the silent hours and discipline rules?" }
+        ],
+        admission: [
+            { label: "Which documents are required?", text: "Which documents are required during check-in at the hostel?" },
+            { label: "How is floor allocation decided?", text: "What is the policy for allocating floors to students based on their class year?" },
+            { label: "Are rooms allocated by preferences?", text: "How does the room type preference allocation work?" }
+        ],
+        complaint_guidance: [
+            { label: "Who repairs ceiling fans?", text: "Who is the staff assigned to repair a room ceiling fan?" },
+            { label: "How do I report a water leakage?", text: "What are the rules and routing for water leakage or plumbing complaints?" },
+            { label: "What is the resolution SLA?", text: "How long does it take for electrical and cleaning issues to be resolved?" }
+        ],
+        room_recommendation: [
+            { label: "Why was I assigned Floor 1?", text: "Explain why 1st year students are recommended to the 1st Floor and how the smart recommendation works." },
+            { label: "Can I change my assigned bed?", text: "Explain the rules around transferring bed allocations." }
+        ],
+        notices: [
+            { label: "What are visitor lobby hours?", text: "What are the policies and visiting hours for parents or guest relatives?" },
+            { label: "How do I get overnight leave?", text: "What are the rules and leave procedures for overnight weekend out-of-town trips?" }
+        ]
+    };
+
+    function updateModePrompts(mode) {
+        const container = document.getElementById("quick-prompts-container");
+        container.innerHTML = "";
+        
+        const prompts = promptData[mode] || promptData.hostel_knowledge;
+        prompts.forEach(p => {
+            const btn = document.createElement("button");
+            btn.className = "btn btn-secondary text-start btn-sm py-2 px-3 quick-prompt";
+            btn.dataset.prompt = p.text;
+            btn.textContent = p.label;
+            
+            // Add click listener
+            btn.addEventListener("click", () => {
+                const chatInput = document.getElementById("chat-input");
+                chatInput.value = btn.dataset.prompt;
+                document.getElementById("chat-send-btn").click();
+            });
+            
+            container.appendChild(btn);
+        });
+
+        // Update placeholder
+        const input = document.getElementById("chat-input");
+        if (mode === 'admission') {
+            input.placeholder = "Ask about hostel check-in documents, fees, rules...";
+        } else if (mode === 'complaint_guidance') {
+            input.placeholder = "Ask about staff routing, plumbers, SLAs...";
+        } else if (mode === 'room_recommendation') {
+            input.placeholder = "Ask about floor rules, capacity, year suggestions...";
+        } else {
+            input.placeholder = "Ask a question about hostel policies...";
+        }
+    }
+    
+    // Initialize prompts on load
+    document.addEventListener("DOMContentLoaded", () => {
+        const activeMode = document.getElementById("ai-mode-select").value;
+        updateModePrompts(activeMode);
+    });
+</script>
+{% endblock %}

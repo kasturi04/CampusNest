@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - HostelOS{% endblock %}
+{% block header_title %}Search Results for "{{ query }}"{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0 p-3 bg-white mb-4">
+    <h5 class="fw-bold mb-4 text-secondary"><i class="bi bi-search"></i> Search Results</h5>
+    
+    {% if not students and not rooms and not complaints %}
+        <div class="text-center py-5 text-secondary">
+            <i class="bi bi-exclamation-circle fs-2 d-block mb-2"></i> No records match your search criteria.
+        </div>
+    {% else %}
+        <!-- Students Results -->
+        {% if students %}
+            <div class="mb-4">
+                <h6 class="fw-bold text-primary border-bottom pb-2 mb-2"><i class="bi bi-people-fill"></i> Students ({{ students|length }})</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm text-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Name</th>
+                                <th>Branch & Year</th>
+                                <th>Room Number</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in students %}
+                            <tr>
+                                <td><strong>{{ s.username }}</strong></td>
+                                <td>{{ s.name }}</td>
+                                <td>{{ s.student_profile.branch }} (Year {{ s.student_profile.year }})</td>
+                                <td>{{ s.student_profile.room.room_number if s.student_profile.room_id else 'Unallocated' }}</td>
+                                <td>
+                                    <span class="badge {% if s.status == 'approved' %}bg-success{% elif s.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ s.status.capitalize() }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('admin.view_student_profile', user_id=s.id) }}" class="btn btn-primary btn-xs py-0.5 px-2" style="font-size:11px;">
+                                        <i class="bi bi-eye"></i> View Profile
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Rooms Results -->
+        {% if rooms %}
+            <div class="mb-4">
+                <h6 class="fw-bold text-success border-bottom pb-2 mb-2"><i class="bi bi-door-closed-fill"></i> Rooms ({{ rooms|length }})</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm text-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Room Number</th>
+                                <th>Coordinator</th>
+                                <th>Floor</th>
+                                <th>Capacity</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in rooms %}
+                            <tr>
+                                <td><strong>Room {{ r.room_number }}</strong></td>
+                                <td>{{ r.hostel_block }}</td>
+                                <td>Floor {{ r.floor }}</td>
+                                <td>{{ r.capacity }} Beds</td>
+                                <td><span class="badge bg-secondary">{{ r.status }}</span></td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('admin.manage_rooms') }}" class="btn btn-success btn-xs py-0.5 px-2" style="font-size:11px;">
+                                        <i class="bi bi-house-gear"></i> Manage Rooms
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Complaints Results -->
+        {% if complaints %}
+            <div class="mb-4">
+                <h6 class="fw-bold text-danger border-bottom pb-2 mb-2"><i class="bi bi-wrench-adjustable"></i> Complaints ({{ complaints|length }})</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm text-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Category</th>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in complaints %}
+                            <tr>
+                                <td><strong>#{{ c.id }}</strong></td>
+                                <td><span class="badge bg-light text-dark border">{{ c.category }}</span></td>
+                                <td>{{ c.title }}</td>
+                                <td><span class="badge {% if c.status == 'Resolved' %}bg-success{% else %}bg-danger{% endif %}">{{ c.status }}</span></td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('complaints.list_tickets') }}" class="btn btn-danger btn-xs py-0.5 px-2" style="font-size:11px;">
+                                        <i class="bi bi-ticket-detailed"></i> View Tickets
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

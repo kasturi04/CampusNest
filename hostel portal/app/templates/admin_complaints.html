@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Complaints Log - HostelOS{% endblock %}
+{% block header_title %}Complaints & Ticket Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h5 class="mb-4 text-primary fw-semibold"><i class="bi bi-wrench-adjustable-circle-fill"></i> System Complaints Registry</h5>
+    
+    {% if tickets %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Date Submitted</th>
+                        <th>Student Details</th>
+                        <th>Category</th>
+                        <th>Title / Description</th>
+                        <th>Status</th>
+                        <th>Assigned Staff</th>
+                        <th>Resolution Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                        <tr>
+                            <td>#{{ ticket.id }}</td>
+                            <td>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <strong>{{ ticket.student.name if ticket.student else 'Unknown' }}</strong><br>
+                                <span class="text-xs text-secondary">Phone: {{ ticket.student.phone if ticket.student else 'N/A' }}</span>
+                            </td>
+                            <td><span class="badge badge-info">{{ ticket.category }}</span></td>
+                            <td>
+                                <div class="fw-semibold">{{ ticket.title }}</div>
+                                <div class="text-secondary text-sm mt-1" style="max-width: 250px; white-space: normal;">
+                                    {{ ticket.description }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if ticket.status == 'Pending' %}
+                                    <span class="badge badge-pending">Pending</span>
+                                {% elif ticket.status == 'Assigned' %}
+                                    <span class="badge badge-info">Assigned</span>
+                                {% elif ticket.status == 'In Progress' %}
+                                    <span class="badge badge-pending">In Progress</span>
+                                {% elif ticket.status == 'Resolved' %}
+                                    <span class="badge badge-success">Resolved</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form action="{{ url_for('complaints.assign_ticket', complaint_id=ticket.id) }}" method="POST" class="d-flex align-items-center gap-2">
+                                    <select name="staff_id" class="form-control form-control-sm py-1" style="font-size:12px; width:130px;" required>
+                                        <option value="" disabled>-- Assign Staff --</option>
+                                        {% for staff in staff_list %}
+                                            <option value="{{ staff.id }}" {% if ticket.assignment and ticket.assignment.staff_id == staff.id %}selected{% endif %}>
+                                                {{ staff.name.split(' ')[0] }} ({{ staff.username }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-secondary btn-sm py-1 px-2" title="Confirm Assignment">
+                                        <i class="bi bi-person-plus"></i>
+                                    </button>
+                                </form>
+                            </td>
+                             <td>
+                                 {% if ticket.status == 'Resolved' %}
+                                     <span class="text-success text-xs"><i class="bi bi-check-circle-fill"></i> {{ ticket.assignment.staff_notes or 'Resolved.' }}</span>
+                                 {% else %}
+                                     <form action="{{ url_for('complaints.admin_resolve_ticket', complaint_id=ticket.id) }}" method="POST" class="d-flex flex-column gap-1" style="max-width: 180px;">
+                                         <input type="text" name="remarks" class="form-control form-control-sm py-1" style="font-size: 11px; height: auto;" placeholder="Resolution notes..." value="Problem Solved" required>
+                                         <button type="submit" class="btn btn-success btn-sm py-1 px-2 d-flex align-items-center justify-content-center gap-1" style="font-size: 11px; font-weight: 600;">
+                                             <i class="bi bi-check-circle"></i> Mark Solved
+                                         </button>
+                                     </form>
+                                 {% endif %}
+                             </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-5 text-secondary">
+            <i class="bi bi-ticket-detailed text-muted" style="font-size: 48px;"></i>
+            <p class="mt-3">No complaints have been filed in the system.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

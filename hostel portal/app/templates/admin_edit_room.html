@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Room - HostelOS{% endblock %}
+{% block header_title %}Edit Room Details{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <h5 class="mb-4 text-primary fw-semibold"><i class="bi bi-pencil-square"></i> Modify Room {{ room.room_number }}</h5>
+            
+            <form action="{{ url_for('admin.edit_room', room_id=room.id) }}" method="POST">
+                <div class="form-group">
+                    <label class="form-label">Room Number</label>
+                    <input type="text" class="form-control" value="{{ room.room_number }}" disabled>
+                    <span class="stat-desc">Room number cannot be changed.</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit-room-type">Room Type</label>
+                    <select name="room_type" id="edit-room-type" class="form-control" required>
+                        <option value="Normal" {% if room.room_type == 'Normal' %}selected{% endif %}>Normal Room</option>
+                        <option value="Executive" {% if room.room_type == 'Executive' %}selected{% endif %}>Executive Room</option>
+                        <option value="AC" {% if room.room_type == 'AC' %}selected{% endif %}>AC Room</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit-hostel-block">Coordinator / Incharge</label>
+                    <select name="hostel_block" id="edit-hostel-block" class="form-control" required>
+                        <option value="KEERTHI" {% if room.hostel_block == 'KEERTHI' %}selected{% endif %}>Keerthi</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit-room-status">Room Status</label>
+                    <select name="status" id="edit-room-status" class="form-control" required>
+                        <option value="Available" {% if room.status == 'Available' %}selected{% endif %}>Available</option>
+                        <option value="Full" {% if room.status == 'Full' %}selected{% endif %}>Full</option>
+                        <option value="Reserved" {% if room.status == 'Reserved' %}selected{% endif %}>Reserved</option>
+                        <option value="Maintenance" {% if room.status == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit-capacity">Room Capacity</label>
+                    <select name="capacity" id="edit-capacity" class="form-control" required>
+                        <option value="3" {% if room.capacity == 3 %}selected{% endif %}>3 Slots</option>
+                        <option value="7" {% if room.capacity == 7 %}selected{% endif %}>7 Slots</option>
+                        <option value="8" {% if room.capacity == 8 %}selected{% endif %}>8 Slots</option>
+                        <option value="10" {% if room.capacity == 10 %}selected{% endif %}>10 Slots</option>
+                    </select>
+                    <span class="stat-desc">Warning: Decreasing capacity will fail if current occupancy exceeds the new limit.</span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                <a href="{{ url_for('admin.manage_rooms') }}" class="btn btn-secondary mt-3 ms-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

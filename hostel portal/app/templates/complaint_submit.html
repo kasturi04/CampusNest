@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}File Complaint - HostelOS{% endblock %}
+{% block header_title %}File Complaint{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <h5 class="mb-3 text-primary fw-semibold"><i class="bi bi-chat-left-text-fill"></i> Submit Complaint to Warden</h5>
+            <p class="text-secondary text-sm mb-4">
+                Write your complaint below. It will be sent directly to the Warden for review and resolution.
+            </p>
+            
+            <form action="{{ url_for('complaints.submit') }}" method="POST">
+                <input type="hidden" name="category" value="Other">
+                <div class="form-group">
+                    <label class="form-label" for="complaint-desc">Complaint Details</label>
+                    <textarea name="description" id="complaint-desc" rows="6" class="form-control" placeholder="Type your complaint here in detail..." required></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-2">Submit to Warden</button>
+                <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary mt-2 ms-2">Cancel</a>
+            </form>
+        </div>
+        
+        <!-- Quick AI Guide -->
+        <div class="card mt-4 bg-light">
+            <div class="d-flex align-items-start gap-3">
+                <div class="text-primary" style="font-size: 24px;"><i class="bi bi-robot"></i></div>
+                <div>
+                    <h6 class="fw-semibold mb-1">Need help filing your ticket?</h6>
+                    <p class="text-secondary text-sm mb-2">
+                        Get instant advice from the AI Assistant on troubleshooting steps or how to describe your technical issue correctly.
+                    </p>
+                    <a href="{{ url_for('ai.assistant', mode='complaint_guidance') }}" class="btn btn-secondary btn-sm bg-white">Ask Complaint Assistant</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

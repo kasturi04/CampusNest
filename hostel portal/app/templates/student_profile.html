@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile Settings - HostelOS{% endblock %}
+{% block header_title %}Profile Settings{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <h5 class="mb-4 text-primary fw-semibold"><i class="bi bi-person-fill-gear"></i> Update Profile Details</h5>
+            
+            <form action="{{ url_for('student.profile') }}" method="POST">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="profile-name">Full Name</label>
+                        <input type="text" name="name" id="profile-name" class="form-control" value="{{ user.name }}" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="profile-phone">Student Phone Number</label>
+                        <input type="text" name="phone" id="profile-phone" class="form-control" value="{{ user.phone }}" required>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="profile-parent-phone">Parent Phone Number</label>
+                        <input type="text" name="parent_phone" id="profile-parent-phone" class="form-control" value="{{ profile.parent_phone }}" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label class="form-label">Roll Number</label>
+                        <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                        <span class="stat-desc">Roll number cannot be changed once registered.</span>
+                    </div>
+                </div>
+                
+                <h6 class="mt-4 mb-3 fw-semibold border-bottom pb-2 text-secondary"><i class="bi bi-shield-fill"></i> Room Leader Details</h6>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="profile-leader-name">Room Leader Name</label>
+                        <input type="text" name="room_leader_name" id="profile-leader-name" class="form-control" value="{{ profile.room_leader_name or '' }}">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="profile-leader-phone">Room Leader Phone</label>
+                        <input type="text" name="room_leader_phone" id="profile-leader-phone" class="form-control" value="{{ profile.room_leader_phone or '' }}">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-3">Save Profile Changes</button>
+            </form>
+        </div>
+        
+        <!-- Password Change Card -->
+        <div class="card mt-4">
+            <h5 class="mb-4 text-primary fw-semibold"><i class="bi bi-shield-lock-fill"></i> Update Account Password</h5>
+            <form action="{{ url_for('auth.change_password') }}" method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="current-pw">Current Password</label>
+                    <input type="password" name="current_password" id="current-pw" class="form-control" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="new-pw">New Password</label>
+                        <input type="password" name="new_password" id="new-pw" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="confirm-pw">Confirm New Password</label>
+                        <input type="password" name="confirm_password" id="confirm-pw" class="form-control" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Change Password</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - HostelOS{% endblock %}
+{% block header_title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Column: Room & Roommates info -->
+    <div class="col-lg-8">
+        <!-- Student Profile Details Card -->
+        <div class="card mb-4">
+            <h5 class="mb-4 text-primary fw-semibold d-flex align-items-center gap-2">
+                <i class="bi bi-person-bounding-box"></i> Student Profile Details
+            </h5>
+            <div class="row">
+                <div class="col-md-6 border-end">
+                    <div class="row mb-2">
+                        <div class="col-5 fw-semibold text-secondary">Full Name:</div>
+                        <div class="col-7 text-dark fw-semibold">{{ g.user.name }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-semibold text-secondary">Roll Number:</div>
+                        <div class="col-7 text-dark">{{ g.user.username }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-semibold text-secondary">Academic Year:</div>
+                        <div class="col-7 text-dark">Year {{ profile.year if profile else 'N/A' }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6 ps-md-4">
+                    <div class="row mb-2">
+                        <div class="col-5 fw-semibold text-secondary">Branch:</div>
+                        <div class="col-7 text-dark">{{ profile.branch if profile else 'N/A' }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-semibold text-secondary">Phone Number:</div>
+                        <div class="col-7 text-dark">{{ g.user.phone }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 fw-semibold text-secondary">Parent Phone:</div>
+                        <div class="col-7 text-dark">{{ profile.parent_phone if profile else 'N/A' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- College & Fee Payment Status Card -->
+        <div class="card mb-4">
+            <h5 class="mb-4 text-primary fw-semibold d-flex align-items-center gap-2">
+                <i class="bi bi-wallet2"></i> Enrollment & Fee Details
+            </h5>
+            <div class="row text-center mb-2">
+                <div class="col-4 border-end">
+                    <div class="stat-label">College Status</div>
+                    {% if profile and profile.collage_status and ('IN CLG' in profile.collage_status.upper() or 'IN COLL' in profile.collage_status.upper()) %}
+                        <div class="mt-1"><span class="badge bg-success text-white py-1 px-3" style="font-size: 13px;">In College</span></div>
+                    {% else %}
+                        <div class="mt-1"><span class="badge bg-warning text-dark py-1 px-3" style="font-size: 13px;">{{ profile.collage_status if (profile and profile.collage_status) else 'N/A' }}</span></div>
+                    {% endif %}
+                </div>
+                <div class="col-4 border-end">
+                    <div class="stat-label">Hostel Fee</div>
+                    {% if profile and profile.hostel_fee_status and 'PAID' in profile.hostel_fee_status.upper() and not 'NOT' in profile.hostel_fee_status.upper() %}
+                        <div class="mt-1"><span class="badge bg-success text-white py-1 px-3" style="font-size: 13px;">Paid</span></div>
+                    {% else %}
+                        <div class="mt-1"><span class="badge bg-danger text-white py-1 px-3" style="font-size: 13px;">{{ profile.hostel_fee_status if (profile and profile.hostel_fee_status) else 'N/A' }}</span></div>
+                    {% endif %}
+                </div>
+                <div class="col-4">
+                    <div class="stat-label">Tuition Fee</div>
+                    {% if profile and profile.tuition_fee_status and 'PAID' in profile.tuition_fee_status.upper() and not 'NOT' in profile.tuition_fee_status.upper() %}
+                        <div class="mt-1"><span class="badge bg-success text-white py-1 px-3" style="font-size: 13px;">Paid</span></div>
+                    {% else %}
+                        <div class="mt-1"><span class="badge bg-danger text-white py-1 px-3" style="font-size: 13px;">{{ profile.tuition_fee_status if (profile and profile.tuition_fee_status) else 'N/A' }}</span></div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if profile and profile.remarks %}
+                <div class="mt-3 alert alert-secondary mb-0 py-2 px-3" style="font-size: 13px; background-color: #f1f5f9; border-color: #e2e8f0; color: #475569;">
+                    <strong>Warden Remarks:</strong> {{ profile.remarks }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Room Allocation Details Card -->
+        <div class="card mb-4">
+            <h5 class="mb-4 text-primary fw-semibold d-flex align-items-center gap-2">
+                <i class="bi bi-house-fill"></i> Room Allocation Details
+            </h5>
+            {% if room %}
+                <div class="row text-center mb-4">
+                    <div class="col-4 border-end">
+                        <div class="stat-label">Room Number</div>
+                        <div class="stat-value text-primary">{{ room.room_number }}</div>
+                    </div>
+                    <div class="col-4 border-end">
+                        <div class="stat-label">Floor</div>
+                        <div class="stat-value">{{ room.floor }}</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-label">Room Type</div>
+                        <div class="stat-value text-info" style="font-size: 20px; line-height: 40px;">{{ room.room_type }}</div>
+                    </div>
+                </div>
+                
+                <!-- Room Explainer Link -->
+                <div class="alert alert-info py-2 px-3 mb-4 d-flex align-items-center justify-content-between" style="font-size: 13px;">
+                    <span><i class="bi bi-robot"></i> Wondering why you were assigned to Room {{ room.room_number }}? Ask the AI Explainer.</span>
+                    <a href="{{ url_for('ai.assistant', mode='room_recommendation') }}" class="btn btn-primary btn-sm py-1 px-3">Ask AI</a>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-exclamation-circle text-warning" style="font-size: 48px;"></i>
+                    <p class="mt-2 text-secondary">You do not currently have a room allocated. Please contact the administrator.</p>
+                </div>
+            {% endif %}
+            
+            {% if roommates %}
+                <h6 class="mt-2 mb-3 fw-semibold"><i class="bi bi-people"></i> My Roommates</h6>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Roll Number</th>
+                                <th>Branch</th>
+                                <th>Phone</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for roommate in roommates %}
+                                <tr>
+                                    <td class="fw-semibold">{{ roommate.name }}</td>
+                                    <td>{{ roommate.username }}</td>
+                                    <td>{{ roommate.student_profile.branch }}</td>
+                                    <td>{{ roommate.phone }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Complaint Tickets Card -->
+        <div class="card mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h5 class="text-primary fw-semibold m-0"><i class="bi bi-chat-left-dots-fill"></i> Maintenance & Complaints</h5>
+                <a href="{{ url_for('complaints.submit') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg"></i> File Complaint
+                </a>
+            </div>
+            
+            {% if complaints %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Category</th>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in complaints %}
+                                <tr>
+                                    <td>#{{ ticket.id }}</td>
+                                    <td><span class="badge badge-info">{{ ticket.category }}</span></td>
+                                    <td class="fw-semibold">{{ ticket.title }}</td>
+                                    <td>
+                                        {% if ticket.status == 'Pending' %}
+                                            <span class="badge badge-pending">Pending</span>
+                                        {% elif ticket.status == 'Assigned' %}
+                                            <span class="badge badge-info">Assigned</span>
+                                        {% elif ticket.status == 'In Progress' %}
+                                            <span class="badge badge-pending">In Progress</span>
+                                        {% elif ticket.status == 'Resolved' %}
+                                            <span class="badge badge-success">Resolved</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ ticket.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        {% if ticket.status != 'Resolved' %}
+                                            <form action="{{ url_for('complaints.resolve_ticket', complaint_id=ticket.id) }}" method="POST" onsubmit="return confirm('Are you sure the issue is solved?');" style="display:inline;">
+                                                <button type="submit" class="btn btn-success btn-xs py-0 px-2" style="font-size:11px; border-radius: 4px;"><i class="bi bi-check-lg"></i> Mark Solved</button>
+                                            </form>
+                                        {% else %}
+                                            <span class="text-success text-xs fw-semibold"><i class="bi bi-check-circle-fill"></i> Completed</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-end mt-3">
+                    <a href="{{ url_for('complaints.list_tickets') }}" class="text-primary text-sm">View full ticket history →</a>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-secondary">
+                    No active complaint tickets filed yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Right Column: Sidebar Panels (Attendance and Notices) -->
+    <div class="col-lg-4">
+        <!-- Attendance Gauge Card -->
+        <div class="card mb-4 text-center">
+            <h5 class="text-primary fw-semibold mb-3"><i class="bi bi-calendar-check"></i> Attendance Record</h5>
+            <div class="d-inline-flex position-relative align-items-center justify-content-center mb-3">
+                <svg width="120" height="120">
+                    <circle cx="60" cy="60" r="50" fill="transparent" stroke="#f3f4f6" stroke-width="10" />
+                    <!-- Circle circumference is 2 * pi * r = 2 * 3.14159 * 50 = 314.16 -->
+                    <circle cx="60" cy="60" r="50" fill="transparent" stroke="#2563eb" stroke-width="10" 
+                            stroke-dasharray="314.16" 
+                            stroke-dashoffset="{{ 314.16 - (314.16 * attendance_pct / 100) }}"
+                            stroke-linecap="round"
+                            transform="rotate(-90 60 60)" />
+                </svg>
+                <div class="position-absolute" style="font-size: 20px; font-weight: 700; font-family: var(--font-heading);">
+                    {{ attendance_pct }}%
+                </div>
+            </div>
+            <p class="text-secondary text-sm">Your cumulative attendance is calculated automatically based on Warden rolls.</p>
+        </div>
+        
+        <!-- Quick Complaint Box Card -->
+        <div class="card mb-4">
+            <h5 class="text-primary fw-semibold mb-3"><i class="bi bi-pencil-square"></i> Quick Complaint to Warden</h5>
+            <p class="text-secondary text-sm mb-3">Submit a quick complaint directly to the Warden.</p>
+            
+            <form action="{{ url_for('complaints.submit') }}" method="POST">
+                <input type="hidden" name="category" value="Other">
+                <div class="form-group mb-3">
+                    <textarea name="description" rows="3" class="form-control form-control-sm" placeholder="Brief details about the issue..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-send-fill"></i> Submit to Warden</button>
+            </form>
+        </div>
+        
+        <!-- Room Leader Information Card -->
+        <div class="card mb-4">
+            <h5 class="text-primary fw-semibold mb-3"><i class="bi bi-shield-fill"></i> Room Leader Details</h5>
+            {% if profile and profile.room_leader_name %}
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar bg-primary text-white" style="width: 44px; height: 44px; font-size: 18px;">
+                        {{ profile.room_leader_name[0] }}
+                    </div>
+                    <div>
+                        <div class="fw-semibold">{{ profile.room_leader_name }}</div>
+                        <div class="text-secondary text-sm"><i class="bi bi-telephone"></i> {{ profile.room_leader_phone }}</div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-secondary text-sm text-center py-2">
+                    No room leader designated. You can update this in settings.
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Notices Card -->
+        <div class="card">
+            <h5 class="text-primary fw-semibold mb-3"><i class="bi bi-bell-fill"></i> Announcements</h5>
+            <div class="notice-list">
+                {% if notices %}
+                    {% for notice in notices %}
+                        <div class="notice-card">
+                            <div class="notice-title">{{ notice.title }}</div>
+                            <div class="notice-meta">Posted on {{ notice.created_at.strftime('%b %d, %I:%M %p') }}</div>
+                            <div class="notice-content">{{ notice.content }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-secondary text-sm text-center py-3">
+                        No active announcements posted.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

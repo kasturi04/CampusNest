@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Profile - HostelOS{% endblock %}
+{% block header_title %}Student Profile Detail{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('admin.list_students') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Back to Students List
+    </a>
+</div>
+
+<div class="row">
+    <!-- Left Column: Student Details Card -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm border-0 p-3 bg-white text-center rounded-3">
+            <div class="avatar bg-primary text-white rounded-circle mx-auto my-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 32px; font-weight: bold;">
+                {{ student.name[0] }}
+            </div>
+            <h4 class="fw-bold mb-1">{{ student.name }}</h4>
+            <span class="badge bg-primary-subtle text-primary mb-3">{{ student.username }}</span>
+            
+            <div class="text-start border-top pt-3 mt-2">
+                <div class="row mb-2">
+                    <div class="col-5 text-secondary text-xs">Branch & Year:</div>
+                    <div class="col-7 text-sm fw-semibold">{{ profile.branch }} (Yr {{ profile.year }})</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5 text-secondary text-xs">Room / Coordinator:</div>
+                    <div class="col-7 text-sm fw-semibold">
+                        {% if room %}
+                            Room {{ room.room_number }} (Coordinator: {{ room.hostel_block }}, Flr {{ room.floor }})
+                        {% else %}
+                            Unallocated
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5 text-secondary text-xs">Student Phone:</div>
+                    <div class="col-7 text-sm fw-semibold"><i class="bi bi-telephone text-muted me-1"></i>{{ student.phone }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5 text-secondary text-xs">Parent Phone:</div>
+                    <div class="col-7 text-sm fw-semibold"><i class="bi bi-telephone-outbound text-muted me-1"></i>{{ profile.parent_phone }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5 text-secondary text-xs">Approval Status:</div>
+                    <div class="col-7 text-sm fw-semibold">
+                        {% if student.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                        {% elif student.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% else %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5 text-secondary text-xs">Registration Date:</div>
+                    <div class="col-7 text-sm fw-semibold">{{ student.created_at.strftime('%Y-%m-%d') }}</div>
+                </div>
+            </div>
+
+            <!-- Room Leader Info -->
+            <div class="text-start border-top pt-3 mt-3">
+                <h6 class="fw-bold text-secondary text-xs mb-2">ROOM LEADER DETAILS</h6>
+                <div class="row mb-1">
+                    <div class="col-5 text-secondary text-xs">Leader Name:</div>
+                    <div class="col-7 text-sm fw-semibold">{{ profile.room_leader_name or 'N/A' }}</div>
+                </div>
+                <div class="row mb-1">
+                    <div class="col-5 text-secondary text-xs">Leader Phone:</div>
+                    <div class="col-7 text-sm fw-semibold">{{ profile.room_leader_phone or 'N/A' }}</div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 mt-4 pt-2 border-top">
+                <a href="{{ url_for('admin.edit_student', user_id=student.id) }}" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-pencil-square"></i> Edit Details
+                </a>
+                <a href="{{ url_for('admin.transfer_room') }}?student_id={{ student.id }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-left-right"></i> Transfer Room
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column: Attendance & Complaints Histories -->
+    <div class="col-lg-8">
+        <!-- Attendance Stats Summary -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 p-3 bg-white text-dark rounded-3 text-center">
+                    <h6 class="text-secondary text-xs mb-1">Attendance Percentage</h6>
+                    <h3 class="fw-bold mb-0 text-primary">{{ attendance_pct }}%</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 p-3 bg-white text-dark rounded-3 text-center">
+                    <h6 class="text-secondary text-xs mb-1">Present Days</h6>
+                    <h3 class="fw-bold mb-0 text-success">{{ present_days }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 p-3 bg-white text-dark rounded-3 text-center">
+                    <h6 class="text-secondary text-xs mb-1">Absent Days</h6>
+                    <h3 class="fw-bold mb-0 text-danger">{{ absent_days }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance History Table -->
+        <div class="card shadow-sm border-0 p-3 bg-white mb-4">
+            <h5 class="fw-bold text-primary mb-3"><i class="bi bi-calendar-check"></i> Attendance History (Latest 10 logs)</h5>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle text-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th class="text-center">Status</th>
+                            <th>Remarks / Explanation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if attendance_history %}
+                            {% for log in attendance_history %}
+                            <tr>
+                                <td>{{ log.attendance_date.strftime('%Y-%m-%d') }}</td>
+                                <td class="text-center">
+                                    {% if log.status == 'Present' %}
+                                        <span class="badge bg-success-subtle text-success">Present</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger">Absent</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.remarks or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center py-3 text-secondary">No attendance has been logged for this student yet.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Complaints History Table -->
+        <div class="card shadow-sm border-0 p-3 bg-white mb-4">
+            <h5 class="fw-bold text-primary mb-3"><i class="bi bi-wrench-adjustable"></i> Maintenance Complaints History</h5>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle text-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if complaints %}
+                            {% for c in complaints %}
+                            <tr>
+                                <td>#{{ c.id }}</td>
+                                <td>{{ c.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td><span class="badge bg-secondary">{{ c.category }}</span></td>
+                                <td><span class="fw-bold">{{ c.title }}</span></td>
+                                <td>
+                                    {% if c.status == 'Pending' %}
+                                        <span class="badge bg-danger">Pending</span>
+                                    {% elif c.status == 'Resolved' %}
+                                        <span class="badge bg-success">Resolved</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">{{ c.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-3 text-secondary">No complaints tickets filed by this student.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

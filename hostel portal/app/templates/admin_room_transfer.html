@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Room Transfer - HostelOS{% endblock %}
+{% block header_title %}Student Room Transfer{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <h5 class="mb-3 text-primary fw-semibold"><i class="bi bi-arrow-left-right"></i> Transfer Student Room Allocation</h5>
+            <p class="text-secondary text-sm mb-4">
+                Move a resident student to another room. The system will automatically update their profile details.
+            </p>
+            
+            <form action="{{ url_for('admin.transfer_room') }}" method="POST">
+                <!-- Select Student -->
+                <div class="form-group">
+                    <label class="form-label" for="transfer-student">Select Resident Student</label>
+                    <select name="student_id" id="transfer-student" class="form-control" required>
+                        <option value="" disabled selected>-- Choose Student --</option>
+                        {% for s in students %}
+                            {% set current_room = 'Room ' ~ s.student_profile.room.room_number if (s.student_profile and s.student_profile.room_id) else 'Unallocated' %}
+                            <option value="{{ s.id }}">
+                                {{ s.name }} (Roll: {{ s.username }} - Current: {{ current_room }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Target Room Selection -->
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        <label class="form-label" for="target-room">Target Room Number</label>
+                        <input type="text" name="room_number" id="target-room" class="form-control" placeholder="E.g. 102" required>
+                        <span class="stat-desc">Enter room number on their year's designated floor.</span>
+                    </div>
+                </div>
+                
+                <!-- Helper: List of vacant rooms -->
+                <div class="mt-4 mb-4 border rounded-3 p-3 bg-light">
+                    <h6 class="fw-semibold text-secondary mb-2"><i class="bi bi-info-circle-fill"></i> Quick Reference: Available Rooms & Vacancies</h6>
+                    <div style="max-height: 150px; overflow-y: auto; font-size: 13px;">
+                        {% if vacancies %}
+                            <ul class="list-unstyled mb-0">
+                                {% for item in vacancies %}
+                                    <li class="mb-2">
+                                        <strong>Room {{ item.room.room_number }}</strong> (Floor {{ item.room.floor }} - {{ item.room.room_type }}):
+                                        <span class="badge bg-white text-dark border me-1">{{ item.vacant_spaces }} spaces vacant</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="text-danger">No vacant rooms are currently available in the hostel!</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-2">Execute Room Transfer</button>
+                <a href="{{ url_for('admin.list_students') }}" class="btn btn-secondary mt-2 ms-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

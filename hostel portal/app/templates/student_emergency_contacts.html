@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Contacts - HostelOS{% endblock %}
+{% block header_title %}Emergency Contacts{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 p-4 rounded-3 bg-white">
+                <h4 class="fw-bold mb-2 text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-telephone-outbound-fill text-danger"></i> Emergency & Coordinator Directory
+                </h4>
+                <p class="text-secondary mb-0">
+                    If you require urgent assistance, please contact the respective coordinator or our medical desk immediately.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Cards Grid -->
+    <div class="row">
+        {% for contact in contacts %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0 h-100 p-4 bg-white rounded-3 contact-card" style="transition: transform 0.2s, box-shadow 0.2s; border-radius: var(--radius-lg) !important;">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                         style="width: 56px; height: 56px; font-size: 22px; 
+                                background: {% if 'doctor' in contact.name.lower() or 'medical' in contact.role.lower() %}linear-gradient(135deg, #ef4444, #dc2626){% else %}linear-gradient(135deg, #2563eb, #1d4ed8){% endif %};">
+                        {% if 'doctor' in contact.name.lower() or 'medical' in contact.role.lower() %}
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        {% else %}
+                            {{ contact.name[0] }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.15rem; font-family: var(--font-heading);">{{ contact.name }}</h5>
+                        <span class="badge {% if 'doctor' in contact.name.lower() or 'medical' in contact.role.lower() %}bg-danger-subtle text-danger{% else %}bg-primary-subtle text-primary{% endif %} py-1.5 px-2.5" style="font-size: 0.75rem; border-radius: 6px;">
+                            {{ contact.role }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 border-top pt-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <small class="text-secondary d-block" style="font-size: 0.75rem;">Phone Number</small>
+                            <span class="fw-bold text-dark" style="font-size: 1rem;">{{ contact.phone }}</span>
+                        </div>
+                        <a href="tel:{{ contact.phone|replace(' ', '') }}" class="btn btn-primary d-flex align-items-center gap-2 px-3 py-2 text-white" style="border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; background-color: var(--primary-color); border: none; transition: background-color 0.2s;">
+                            <i class="bi bi-telephone-fill"></i> Call Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .contact-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+    }
+</style>
+{% endblock %}
