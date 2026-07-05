@@ -74,13 +74,13 @@ The platform is built on a lightweight, modular MVC pattern ensuring fast respon
 ---
 
 ## 📅 Development Timeline & Work Done
-The project is scheduled across an **8-week execution plan**[cite: 1]:
-*   **Week 1:** Requirement Analysis[cite: 1]
-*   **Week 2:** System Architecture & Schema Mapping[cite: 1]
-*   **Weeks 3–5:** Core Flask Backend Development[cite: 1]
-*   **Weeks 4–6:** Responsive Frontend Implementation[cite: 1]
-*   **Week 7:** Unit, Integration & System Testing[cite: 1]
-*   **Week 8:** Final Documentation & Release[cite: 1]
+The project is scheduled across an **8-week execution plan**:
+*   **Week 1:** Requirement Analysis
+*   **Week 2:** System Architecture & Schema Mapping
+*   **Weeks 3–5:** Core Flask Backend Development
+*   **Weeks 4–6:** Responsive Frontend Implementation
+*   **Week 7:** Unit, Integration & System Testing
+*   **Week 8:** Final Documentation & Release
 
 ### ⏱️ First 10 Days Sprint Summary
 *   **Days 1–3:** Problem discovery, requirements definition, and structural architecture modeling.
